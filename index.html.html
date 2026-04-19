@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Financeiro</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Brand colors from logo */
+  --navy:#0f1040;--navy-d:#07082a;--navy-m:#1e2d69;--navy-l:#2d3d8a;
+  --green:#4b782d;--green-m:#5a8c34;--green-l:#87a54b;--green-xl:#a8c870;
+  --bg:#0a0b0d;--bg2:#111318;--bg3:#181b22;--bg4:#1e222c;
+  --surface:#1a1d26;--surface2:#20242f;--surface3:#252933;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#f0f2f8;--text2:#a3a4a6;--text3:#6b6e7a;
+  --accent:#4b9ef0;--accent-l:#6fb3ff;
+  --gold:#e8a940;--gold-l:#f5c860;
+  --danger:#e05252;--success:#4caf7d;
+  --radius:10px;--radius-l:14px;--radius-xl:18px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--navy-m);border-radius:3px}
+
+/* ── NAV ── */
+nav{background:rgba(10,11,13,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:500}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;cursor:pointer}
+.logo-svg{width:38px;height:38px;flex-shrink:0}
+.logo-name{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#fff;line-height:1.1}
+.logo-name span{color:var(--text2);font-weight:300;font-size:11px;display:block;letter-spacing:0.06em;margin-top:1px}
+.nav-links{display:flex;gap:1px}
+.nav-links a{font-size:13px;padding:6px 12px;border-radius:8px;text-decoration:none;color:var(--text2);cursor:pointer;transition:all 0.15s;font-weight:500}
+.nav-links a:hover,.nav-links a.active{background:rgba(75,120,45,0.15);color:var(--green-xl)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--success);font-weight:600;background:rgba(76,175,125,0.1);padding:4px 10px;border-radius:20px;border:1px solid rgba(76,175,125,0.2)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.nav-cta{background:var(--green);color:#fff;font-size:12.5px;padding:7px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.nav-cta:hover{background:var(--green-m)}
+
+/* ── PAGES ── */
+.page{display:none;animation:fadeIn 0.2s ease;min-height:calc(100vh - 62px)}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO ── */
+.hero{background:var(--navy-d);padding:5rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-rings{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.h-ring{position:absolute;border-radius:50%;border:1px solid rgba(75,120,45,0.12)}
+.hero-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:1.1fr 0.9fr;gap:4rem;align-items:center;position:relative;z-index:1}
+.hero-tag{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--green-l);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.hero-tag::before{content:'';display:inline-block;width:24px;height:2px;background:var(--green-l)}
+.hero h1{font-family:'Sora',sans-serif;font-size:40px;font-weight:700;line-height:1.18;letter-spacing:-0.025em;margin-bottom:14px;color:#fff}
+.hero h1 em{color:var(--green-xl);font-style:normal}
+.hero p{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:2rem;max-width:420px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-g{background:var(--green);color:#fff;padding:11px 22px;border-radius:10px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.btn-g:hover{background:var(--green-m)}
+.btn-o{background:transparent;color:var(--text2);padding:11px 22px;border-radius:10px;border:1px solid var(--border2);font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.btn-o:hover{border-color:var(--green-l);color:var(--green-xl)}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hs{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.1rem 1.25rem;transition:border-color 0.15s}
+.hs:hover{border-color:rgba(75,120,45,0.3)}
+.hs-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:5px;font-weight:600}
+.hs-val{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:#fff;line-height:1}
+.hs-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.hs-up{color:var(--success)} .hs-down{color:var(--danger)}
+.hs.loading .hs-val{background:var(--bg3);border-radius:5px;color:transparent;animation:shimmer 1.2s ease infinite alternate}
+@keyframes shimmer{from{opacity:0.4}to{opacity:0.8}}
+
+/* ── TICKER ── */
+.ticker{background:var(--navy-d);border-top:1px solid var(--border);padding:9px 0;overflow:hidden}
+.ticker-track{display:flex;gap:0;white-space:nowrap;animation:scroll 50s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick{display:inline-flex;align-items:center;gap:7px;padding:0 1.5rem}
+.t-name{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);font-weight:600}
+.t-val{font-family:'Sora',sans-serif;font-size:13px;font-weight:600;color:var(--text)}
+.t-chg{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.t-up{background:rgba(76,175,125,0.12);color:var(--success)}
+.t-dn{background:rgba(224,82,82,0.12);color:var(--danger)}
+.tick-sep{display:inline-block;width:1px;height:14px;background:var(--border);vertical-align:middle;margin:0 0.5rem}
+
+/* ── SECTION ── */
+.section{padding:2.5rem 2rem;max-width:960px;margin:0 auto}
+.sec-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
+.sec-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.01em}
+.sec-sub{font-size:13px;color:var(--text2);margin-top:3px}
+.sec-link{font-size:13px;color:var(--green-l);font-weight:600;cursor:pointer;white-space:nowrap}
+.sec-link:hover{color:var(--green-xl)}
+
+/* ── CARDS ── */
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.25rem;cursor:pointer;transition:all 0.2s}
+.card:hover{border-color:rgba(75,120,45,0.4);transform:translateY(-2px);background:var(--surface2)}
+.c-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;flex-shrink:0}
+.ci-navy{background:rgba(30,45,105,0.5);border:1px solid rgba(30,45,105,0.8)}
+.ci-green{background:rgba(75,120,45,0.2);border:1px solid rgba(75,120,45,0.3)}
+.ci-gold{background:rgba(232,169,64,0.15);border:1px solid rgba(232,169,64,0.25)}
+.ci-blue{background:rgba(75,158,240,0.15);border:1px solid rgba(75,158,240,0.25)}
+.ci-red{background:rgba(224,82,82,0.12);border:1px solid rgba(224,82,82,0.2)}
+.card h3{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;color:#fff;margin-bottom:5px}
+.card p{font-size:12.5px;color:var(--text2);line-height:1.6}
+.pill{display:inline-block;font-size:10.5px;padding:3px 10px;border-radius:20px;margin-top:10px;font-weight:700;letter-spacing:0.02em}
+.p-g{background:rgba(75,120,45,0.2);color:var(--green-xl)}
+.p-b{background:rgba(75,158,240,0.15);color:var(--accent-l)}
+.p-gd{background:rgba(232,169,64,0.15);color:var(--gold-l)}
+.p-r{background:rgba(224,82,82,0.12);color:#f08080}
+.p-n{background:rgba(30,45,105,0.4);color:#8899dd}
+
+/* ── CALCULADORAS ENGINE ── */
+.calc-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden}
+.calc-header{padding:1.5rem 1.75rem 0;border-bottom:1px solid var(--border)}
+.calc-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.calc-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#fff}
+.api-tag{font-size:11px;color:var(--success);background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.2);padding:3px 10px;border-radius:20px;font-weight:600;display:flex;align-items:center;gap:5px}
+.calc-tabs{display:flex;gap:4px;flex-wrap:wrap;padding-bottom:0}
+.calc-tab{font-size:12.5px;padding:8px 16px;border-radius:8px 8px 0 0;border:none;background:transparent;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;font-weight:500;transition:all 0.15s;border-bottom:2px solid transparent;margin-bottom:-1px}
+.calc-tab:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+.calc-tab.active{color:var(--green-xl);font-weight:700;border-bottom:2px solid var(--green)}
+.calc-body{padding:1.75rem}
+.calc-panel{display:none}
+.calc-panel.active{display:block}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.25rem}
+.fg label{font-size:11.5px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500}
+.fg input,.fg select{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-size:13.5px;background:var(--bg3);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s}
+.fg input:focus,.fg select:focus{border-color:var(--green)}
+.fg select option{background:var(--bg3)}
+.result-box{background:linear-gradient(135deg,var(--navy-d),var(--navy));border-radius:var(--radius-l);padding:1.5rem;margin-top:1.25rem;border:1px solid rgba(30,45,105,0.6)}
+.rb-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:6px;font-weight:700}
+.rb-val{font-family:'Sora',sans-serif;font-size:32px;font-weight:700;color:#fff;line-height:1;margin-bottom:8px}
+.rb-val span{font-size:15px;font-weight:400;color:var(--text3);margin-left:4px}
+.rb-detail{font-size:12px;color:var(--text3);line-height:1.7}
+.rb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:1.1rem}
+.rb-mini{background:rgba(255,255,255,0.05);border-radius:8px;padding:11px 13px;border:1px solid var(--border)}
+.rb-mini .ml{font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600}
+.rb-mini .mv{font-family:'Sora',sans-serif;font-size:16px;font-weight:600;color:#fff}
+.rb-mini .mv.green{color:var(--success)}
+.rb-mini .mv.red{color:var(--danger)}
+.tip{background:rgba(75,120,45,0.1);border:1px solid rgba(75,120,45,0.2);border-radius:10px;padding:1rem 1.25rem;margin-top:1.25rem}
+.tip-t{font-size:12px;font-weight:700;color:var(--green-xl);margin-bottom:4px}
+.tip p{font-size:12.5px;color:var(--text2);line-height:1.7}
+
+/* ── COMPARADOR ── */
+.comp-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem}
+.comp-f{font-size:12.5px;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--text2);font-weight:500;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.comp-f.active{background:rgba(75,120,45,0.2);color:var(--green-xl);border-color:var(--green)}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}
+.comp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.5rem;text-align:center;transition:all 0.2s;position:relative}
+.comp-card:hover{transform:translateY(-2px);background:var(--surface2)}
+.comp-card.top{border:1px solid rgba(75,120,45,0.5)}
+.comp-card.top::before{content:attr(data-badge);position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;font-size:9.5px;font-weight:800;padding:3px 12px;border-radius:20px;white-space:nowrap;letter-spacing:0.04em}
+.cc-inst{font-size:11.5px;color:var(--text3);margin-bottom:6px;font-weight:500}
+.cc-taxa{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#fff;line-height:1}
+.cc-tipo{font-size:11px;color:var(--text3);margin:5px 0 12px;line-height:1.6}
+.comp-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:1rem}
+.comp-table th{background:var(--navy-d);color:var(--text2);padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700}
+.comp-table td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text)}
+.comp-table tr:hover td{background:var(--surface2)}
+.comp-table .best{color:var(--success);font-weight:700}
+
+/* ── ARTIGOS ── */
+.art-layout{display:grid;grid-template-columns:1fr 260px;gap:2rem}
+.cms-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.cms-f{font-size:12px;padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--text2);font-weight:500;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.cms-f.active{background:rgba(75,120,45,0.2);color:var(--green-xl);border-color:var(--green)}
+.art-list{display:flex;flex-direction:column;gap:12px}
+.artigo{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);display:flex;cursor:pointer;transition:all 0.2s;overflow:hidden}
+.artigo:hover{border-color:rgba(75,120,45,0.4);background:var(--surface2)}
+.art-img{width:120px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg3)}
+.art-body{padding:1.1rem 1.25rem;flex:1}
+.art-cat{font-size:10px;font-weight:800;color:var(--green-l);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px}
+.art-body h4{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:5px}
+.art-body p{font-size:12.5px;color:var(--text2);line-height:1.6}
+.art-foot{display:flex;align-items:center;gap:8px;margin-top:9px}
+.nivel{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:700}
+.n-i{background:rgba(75,120,45,0.2);color:var(--green-xl)}
+.n-m{background:rgba(75,158,240,0.15);color:var(--accent-l)}
+.n-a{background:rgba(232,169,64,0.15);color:var(--gold-l)}
+.art-time{font-size:11px;color:var(--text3)}
+/* Sidebar */
+.sb-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.15rem;margin-bottom:12px}
+.sb-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.pop-item{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.pop-item:last-child{border:none;padding-bottom:0}
+.pop-n{font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--navy-m);flex-shrink:0;line-height:1.1}
+.pop-item h6{font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer;line-height:1.4}
+.pop-item h6:hover{color:var(--green-l)}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11.5px;padding:4px 11px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;color:var(--text2);font-weight:500;transition:all 0.15s}
+.tag:hover{background:rgba(75,120,45,0.2);color:var(--green-xl);border-color:var(--green)}
+/* Article detail */
+.art-detail{display:none}
+.art-detail.show{display:block}
+.bread{font-size:12.5px;color:var(--text2);cursor:pointer;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px}
+.bread:hover{color:var(--green-l)}
+.art-hero-box{background:var(--navy-d);border:1px solid rgba(30,45,105,0.5);border-radius:var(--radius-xl);padding:2.5rem;margin-bottom:2rem}
+.art-hero-cat{font-size:10px;font-weight:800;color:var(--green-l);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.art-hero-box h2{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:10px}
+.art-meta{display:flex;gap:14px;font-size:12px;color:var(--text3);flex-wrap:wrap}
+.art-content{max-width:680px;font-size:14.5px;line-height:1.85;color:var(--text2)}
+.art-content h3{font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#fff;margin:2rem 0 0.8rem}
+.art-content p{margin-bottom:1rem}
+.art-hl{background:rgba(75,120,45,0.1);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin:1.5rem 0;color:var(--text);font-weight:500;font-size:13.5px}
+.art-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:13px}
+.art-table th{background:var(--navy-d);color:var(--text2);padding:9px 13px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;border-bottom:1px solid var(--border)}
+.art-table td{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text)}
+.art-table tr:hover td{background:var(--surface2)}
+
+/* ── TRILHAS ── */
+.trilha-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.trilha-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);overflow:hidden;cursor:pointer;transition:all 0.2s}
+.trilha-card:hover{border-color:rgba(75,120,45,0.4);transform:translateY(-2px)}
+.trilha-header{padding:1.25rem 1.5rem;display:flex;align-items:center;gap:12px}
+.trilha-num{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;opacity:0.15;line-height:1}
+.trilha-info h4{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.trilha-info span{font-size:11px;color:var(--text3)}
+.trilha-items{padding:0 1.5rem 1.25rem}
+.trilha-item{font-size:12.5px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.trilha-item:last-child{border:none;padding-bottom:0}
+.trilha-item::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.trilha-i{background:rgba(75,120,45,0.2);border-color:rgba(75,120,45,0.4)}
+.trilha-m{background:rgba(75,158,240,0.1);border-color:rgba(75,158,240,0.3)}
+.trilha-a{background:rgba(232,169,64,0.1);border-color:rgba(232,169,64,0.3)}
+.trilha-i .trilha-num{color:var(--green-xl)}
+.trilha-m .trilha-num{color:var(--accent)}
+.trilha-a .trilha-num{color:var(--gold)}
+.trilha-i .trilha-item::before{background:var(--green)}
+.trilha-m .trilha-item::before{background:var(--accent)}
+.trilha-a .trilha-item::before{background:var(--gold)}
+
+/* ── GLOSSÁRIO ── */
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.gloss-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem}
+.gloss-term{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:var(--green-l);margin-bottom:4px}
+.gloss-def{font-size:12.5px;color:var(--text2);line-height:1.6}
+
+/* ── MACRO TABLE ── */
+.macro-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--surface);border-radius:var(--radius-l);overflow:hidden;border:1px solid var(--border)}
+.macro-table th{background:var(--navy-d);color:var(--text2);padding:11px 16px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700}
+.macro-table td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text)}
+.macro-table tr:last-child td{border:none}
+.macro-table tr:hover td{background:var(--surface2)}
+.macro-up{color:var(--success);font-weight:600}
+.macro-dn{color:var(--danger);font-weight:600}
+
+/* ── CARTÕES ── */
+.cartao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.5rem;cursor:pointer;transition:all 0.2s}
+.cartao-card:hover{border-color:rgba(75,120,45,0.4);transform:translateY(-2px)}
+.cartao-card.destaque{border-color:var(--green)}
+.cc-bandeira{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.cc-nome{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff}
+.cc-banco{font-size:11.5px;color:var(--text3)}
+.cc-anuidade{font-size:12px;color:var(--text2);margin-bottom:8px}
+.cc-benefit{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;padding:4px 0}
+.cc-benefit::before{content:'✓';color:var(--success);font-weight:700;font-size:11px}
+.cc-badge{display:inline-block;font-size:10px;padding:2px 9px;border-radius:20px;font-weight:700;margin-top:8px}
+
+/* ── FERRAMENTAS ── */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.35rem;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;gap:8px}
+.tool-card:hover{border-color:rgba(75,120,45,0.4);background:var(--surface2);transform:translateY(-2px)}
+.tool-type{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:var(--text3)}
+.tool-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff}
+.tool-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.tool-arrow{color:var(--green-l);font-size:18px;margin-top:auto;align-self:flex-end}
+
+/* ── NEWSLETTER ── */
+.nl-hero{background:var(--navy-d);border:1px solid rgba(30,45,105,0.5);border-radius:var(--radius-xl);padding:3.5rem;text-align:center;margin-bottom:2rem;position:relative;overflow:hidden}
+.nl-hero::before{content:'';position:absolute;width:400px;height:400px;border-radius:50%;border:1px solid rgba(75,120,45,0.07);top:-150px;right:-100px;pointer-events:none}
+.nl-hero .eyebrow{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-l);font-weight:700;margin-bottom:12px}
+.nl-hero h2{font-family:'Sora',sans-serif;font-size:32px;font-weight:700;color:#fff;margin-bottom:12px;line-height:1.3}
+.nl-hero p{font-size:14.5px;color:var(--text2);max-width:460px;margin:0 auto 2rem;line-height:1.8}
+.nl-form{display:flex;gap:10px;max-width:440px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.nl-input{flex:1;min-width:200px;padding:12px 16px;border-radius:9px;border:1px solid var(--border2);background:var(--bg3);font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none}
+.nl-input:focus{border-color:var(--green)}
+.nl-btn{background:var(--green);color:#fff;padding:12px 20px;border-radius:9px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:background 0.15s}
+.nl-btn:hover{background:var(--green-m)}
+.nl-ok{display:none;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.25);border-radius:10px;padding:1rem 1.5rem;color:var(--success);font-size:14px;font-weight:600;text-align:center;margin-top:1rem}
+.nl-priv{font-size:11px;color:var(--text3);margin-top:12px}
+.nl-benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:2rem}
+.nl-ben{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.35rem}
+.nl-ben-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.nl-ben h4{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px}
+.nl-ben p{font-size:12.5px;color:var(--text2);line-height:1.6}
+.editions-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);overflow:hidden}
+.ed-header{background:var(--navy-d);padding:1.1rem 1.5rem;display:flex;justify-content:space-between;align-items:center}
+.ed-header h3{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.ed-item{padding:1.1rem 1.5rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;display:flex;gap:1rem;align-items:flex-start}
+.ed-item:last-child{border:none}
+.ed-item:hover{background:var(--surface2)}
+.ed-date{font-size:11px;color:var(--text3);white-space:nowrap;margin-top:2px;min-width:65px}
+.ed-body h5{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:#fff;margin-bottom:3px}
+.ed-body p{font-size:12px;color:var(--text2);line-height:1.5}
+.ed-tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+
+/* ── FOOTER ── */
+footer{background:var(--navy-d);border-top:1px solid var(--border);color:var(--text3);padding:3rem 2rem 1.75rem;margin-top:4rem}
+.ft-inner{max-width:960px;margin:0 auto}
+.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.ft-brand .ft-logo{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.ft-brand p{font-size:12.5px;line-height:1.8;max-width:250px}
+.ft-col h5{font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:14px;font-weight:700}
+.ft-col a{display:block;font-size:12.5px;color:rgba(255,255,255,0.4);text-decoration:none;margin-bottom:9px;cursor:pointer;transition:color 0.15s}
+.ft-col a:hover{color:var(--green-l)}
+.ft-bottom{border-top:1px solid var(--border);padding-top:1.25rem;display:flex;justify-content:space-between;font-size:11.5px;flex-wrap:wrap;gap:8px}
+
+/* ── INV SECTION TABS ── */
+.inv-section-tabs{display:flex;gap:8px;margin-bottom:1.5rem}
+.ist{display:flex;align-items:center;gap:8px;font-size:14px;padding:10px 20px;border-radius:var(--radius-l);border:1px solid var(--border2);background:var(--surface);cursor:pointer;color:var(--text2);font-weight:600;font-family:'DM Sans',sans-serif;transition:all 0.18s}
+.ist:hover{background:var(--surface2);border-color:rgba(75,120,45,0.4);color:var(--text)}
+.ist.active{background:rgba(75,120,45,0.15);border-color:var(--green);color:var(--green-xl)}
+.inv-section{display:none}
+.inv-section.active{display:block;animation:fadeIn 0.2s ease}
+.inv-section-intro{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.1rem 1.5rem;margin-bottom:1.25rem}
+.isi-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.isi-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px}
+.isi-sub{font-size:12.5px;color:var(--text2);line-height:1.5}
+.isi-sub strong{color:var(--text)}
+
+/* ── NEWS HOME ── */
+.news-layout{display:grid;grid-template-columns:1fr 280px;gap:16px}
+.news-main-col{display:flex;flex-direction:column;gap:0}
+.news-card-big{background:var(--surface);border:1px solid var(--border);padding:1.3rem 1.5rem;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:8px}
+.news-card-big:first-child{border-radius:var(--radius-l) var(--radius-l) 0 0;border-bottom:none}
+.news-card-big:last-child{border-radius:0 0 var(--radius-l) var(--radius-l)}
+.news-card-big:hover{background:var(--surface2);border-color:rgba(75,120,45,0.35)}
+.news-cat-tag{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;width:fit-content}
+.news-card-big h4{font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;color:#fff;line-height:1.4}
+.news-card-big p{font-size:12.5px;color:var(--text2);line-height:1.6}
+.news-meta-row{display:flex;gap:14px;font-size:11px;color:var(--text3);margin-top:2px}
+.news-side-col{}
+.news-side-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--green-l);padding-bottom:10px;border-bottom:2px solid rgba(75,120,45,0.3);margin-bottom:10px}
+.news-mini-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem;cursor:pointer;margin-bottom:8px;transition:all 0.15s}
+.news-mini-card:last-child{margin-bottom:0}
+.news-mini-card:hover{border-color:rgba(75,120,45,0.35);background:var(--surface2)}
+.news-mini-card h5{font-size:13px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:4px}
+.news-mini-meta{font-size:11px;color:var(--text3)}
+
+@media(max-width:720px){
+  .hero-inner{grid-template-columns:1fr}
+  .hero-stats,.hero p{display:none}
+  .art-layout{grid-template-columns:1fr}
+  .art-img{display:none}
+  .ft-top{grid-template-columns:1fr;gap:1.5rem}
+  nav .nav-links{display:none}
+  .ft-top .ft-col:not(:first-child){display:none}
+  .news-layout{grid-template-columns:1fr}
+  .news-side-col{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" onclick="navTo('home',null)">
+    <svg class="logo-svg" viewBox="0 0 38 38" fill="none">
+      <!-- Radar rings -->
+      <circle cx="19" cy="19" r="17" stroke="#1e2d69" stroke-width="1.2" fill="none" opacity="0.8"/>
+      <circle cx="19" cy="19" r="11.5" stroke="#1e2d69" stroke-width="1" fill="none" opacity="0.6"/>
+      <circle cx="19" cy="19" r="6" stroke="#1e2d69" stroke-width="0.8" fill="none" opacity="0.4"/>
+      <!-- Arrow (green) -->
+      <path d="M19 22 L24 10 L28 14" stroke="#4b782d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M24 10 L20 13" stroke="#87a54b" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Center dot -->
+      <circle cx="19" cy="22" r="2.2" fill="#1e2d69" opacity="0.9"/>
+      <!-- Scan line -->
+      <line x1="19" y1="19" x2="33" y2="14" stroke="#4b782d" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+    </svg>
+    <div class="logo-name">Radar <span>FINANCEIRO</span></div>
+  </a>
+  <div class="nav-links">
+    <a class="active" onclick="navTo('home',this)">Início</a>
+    <a onclick="navTo('investimentos',this)">Investimentos</a>
+    <a onclick="navTo('avancado',this)">Avançado</a>
+    <a onclick="navTo('cartoes',this)">Cartões</a>
+    <a onclick="navTo('educacao',this)">Educação</a>
+    <a onclick="navTo('ferramentas',this)">Ferramentas</a>
+    <a onclick="navTo('newsletter',this)">Newsletter</a>
+  </div>
+  <div class="nav-right">
+    <span class="live-badge"><span class="live-dot"></span> BCB ao vivo</span>
+    <button class="nav-cta" onclick="navTo('newsletter',null)">Assinar grátis</button>
+  </div>
+</nav>
+
+<!-- ════════════════ HOME ════════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-rings">
+      <div class="h-ring" style="width:700px;height:700px;top:-250px;right:-200px"></div>
+      <div class="h-ring" style="width:400px;height:400px;bottom:-150px;left:-100px"></div>
+    </div>
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">Portal financeiro completo</div>
+        <h1>Decisões <em>inteligentes</em><br>começam com<br>dados reais</h1>
+        <p>Simuladores, comparadores, educação financeira e análises de mercado — com dados ao vivo do Banco Central do Brasil.</p>
+        <div class="hero-btns">
+          <button class="btn-g" onclick="navTo('investimentos',null)">Simular investimento</button>
+          <button class="btn-o" onclick="navTo('educacao',null)">Aprender finanças</button>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="hs loading" id="hs-selic-box"><div class="hs-label">Selic</div><div class="hs-val" id="hs-selic">—</div><div class="hs-sub">taxa básica a.a.</div></div>
+        <div class="hs loading" id="hs-ipca-box"><div class="hs-label">IPCA 12m</div><div class="hs-val" id="hs-ipca">—</div><div class="hs-sub">inflação acumulada</div></div>
+        <div class="hs loading" id="hs-cdi-box"><div class="hs-label">CDI</div><div class="hs-val" id="hs-cdi">—</div><div class="hs-sub">ao ano</div></div>
+        <div class="hs loading" id="hs-poup-box"><div class="hs-label">Poupança</div><div class="hs-val" id="hs-poup">—</div><div class="hs-sub">ao ano — evite!</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-track" id="ticker-track">
+      <span class="tick"><span class="t-name">Selic</span><span class="t-val" id="tk-selic">10,50%</span><span class="t-chg t-up">▲ estável</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">CDI</span><span class="t-val" id="tk-cdi">10,40%</span><span class="t-chg t-up">a.a.</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">IPCA</span><span class="t-val" id="tk-ipca">4,83%</span><span class="t-chg t-up">▲ 12m</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">Poupança</span><span class="t-val">6,17%</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">USD/BRL</span><span class="t-val" id="tk-dolar">R$ 5,84</span><span class="t-chg t-dn">▼</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">IBOVESPA</span><span class="t-val" id="tk-ibov">127.840</span><span class="t-chg t-up">pts</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">IPCA+</span><span class="t-val">6,2% a.a.</span><span class="t-chg t-up">Tesouro 2035</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">Selic</span><span class="t-val">10,50%</span><span class="t-chg t-up">▲ estável</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">CDI</span><span class="t-val">10,40%</span><span class="t-chg t-up">a.a.</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">IPCA</span><span class="t-val">4,83%</span><span class="t-chg t-up">▲ 12m</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">Poupança</span><span class="t-val">6,17%</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">USD/BRL</span><span class="t-val">R$ 5,84</span><span class="t-chg t-dn">▼</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">IBOVESPA</span><span class="t-val">127.840</span><span class="t-chg t-up">pts</span></span><span class="tick-sep"></span>
+      <span class="tick"><span class="t-name">IPCA+</span><span class="t-val">6,2% a.a.</span></span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hd"><div><div class="sec-title">Simuladores de investimento</div><div class="sec-sub">Calcule com CDI real do Banco Central</div></div><span class="sec-link" onclick="navTo('investimentos',null)">Ver todos →</span></div>
+    <div class="grid-4">
+      <div class="card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('cdb',null),100)">
+        <div class="c-icon ci-navy"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#8899dd" stroke-width="1.5"/><path d="M6 7h8M6 10h8M6 13h5" stroke="#8899dd" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+        <h3>Simulador CDB</h3><p>Calcule rendimento bruto e líquido com CDI ao vivo.</p><span class="pill p-n">CDB</span>
+      </div>
+      <div class="card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('lci',null),100)">
+        <div class="c-icon ci-green"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16L10 4l6 12" stroke="#87a54b" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M6.5 11.5h7" stroke="#87a54b" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+        <h3>Simulador LCI/LCA</h3><p>Isento de IR — saiba quando compensa mais que CDB.</p><span class="pill p-g">LCI · LCA</span>
+      </div>
+      <div class="card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('tesouro',null),100)">
+        <div class="c-icon ci-gold"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#e8a940" stroke-width="1.5"/><path d="M10 6.5v3.5l2.5 2" stroke="#e8a940" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <h3>Tesouro Direto</h3><p>Selic, prefixado e IPCA+ — simulação com marcação a mercado.</p><span class="pill p-gd">Tesouro</span>
+      </div>
+      <div class="card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('comparar',null),100)">
+        <div class="c-icon ci-blue"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V9M10 16V4M16 16V12" stroke="#4b9ef0" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Qual rende mais?</h3><p>Comparador automático de todos os produtos lado a lado.</p><span class="pill p-b">Comparar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="sec-hd"><div><div class="sec-title">Notícias do mercado</div><div class="sec-sub">Atualizações que impactam seus investimentos</div></div><span class="sec-link" onclick="navTo('educacao',null)">Ver tudo →</span></div>
+    <div class="news-layout">
+      <div class="news-main-col">
+        <div class="news-card-big" onclick="navTo('educacao',null);setTimeout(()=>abrirEdu('cdb-lci'),100)">
+          <div class="news-cat-tag p-n">Selic</div>
+          <h4>Copom mantém Selic em 10,50% — o que muda para seus investimentos</h4>
+          <p>Com a taxa básica estável, títulos pós-fixados continuam atrativos. Veja quais produtos se beneficiam mais neste cenário de juros altos.</p>
+          <div class="news-meta-row"><span>Hoje, 14:32</span><span>7 min de leitura</span></div>
+        </div>
+        <div class="news-card-big" onclick="navTo('educacao',null)">
+          <div class="news-cat-tag p-g">Tesouro</div>
+          <h4>Tesouro IPCA+ a 6,2% a.a. — oportunidade histórica para longo prazo</h4>
+          <p>Especialistas alertam para janela de compra em títulos atrelados à inflação que não aparecia desde 2016. Entenda o risco de marcação a mercado.</p>
+          <div class="news-meta-row"><span>Hoje, 11:15</span><span>10 min de leitura</span></div>
+        </div>
+      </div>
+      <div class="news-side-col">
+        <div class="news-side-title">Mais notícias</div>
+        <div class="news-mini-card" onclick="navTo('educacao',null)">
+          <h5>Dólar cai para R$ 5,84 com alívio externo</h5>
+          <span class="news-mini-meta">Câmbio · Ontem</span>
+        </div>
+        <div class="news-mini-card" onclick="navTo('educacao',null)">
+          <h5>Nubank lança CDB 113% CDI com liquidez diária</h5>
+          <span class="news-mini-meta">CDB · 2 dias atrás</span>
+        </div>
+        <div class="news-mini-card" onclick="navTo('educacao',null)">
+          <h5>FGC garante até R$ 250 mil: entenda a cobertura</h5>
+          <span class="news-mini-meta">Segurança · 3 dias atrás</span>
+        </div>
+        <div class="news-mini-card" onclick="navTo('educacao',null)">
+          <h5>Poupança perde para inflação pelo 4º mês seguido</h5>
+          <span class="news-mini-meta">Poupança · 4 dias atrás</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="sec-hd"><div><div class="sec-title">O que você encontra aqui</div><div class="sec-sub">O portal financeiro mais completo do Brasil</div></div></div>
+    <div class="grid-3">
+      <div class="card" onclick="navTo('investimentos',null)">
+        <div class="c-icon ci-navy"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 18V10M9 18V6M14 18V12M19 18V4" stroke="#8899dd" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Investimentos</h3><p>CDB, LCI, LCA, Tesouro Selic, Prefixado, IPCA+, juros compostos e independência financeira.</p><span class="pill p-n">8 simuladores</span>
+      </div>
+      <div class="card" onclick="navTo('avancado',null)">
+        <div class="c-icon ci-gold"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#e8a940" stroke-width="1.5"/><path d="M8 11l2 2 4-4" stroke="#e8a940" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Renda fixa avançada</h3><p>Equivalência de taxas, impacto de IR e IOF, taxa real, marcação a mercado em prefixados e IPCA+.</p><span class="pill p-gd">Diferencial</span>
+      </div>
+      <div class="card" onclick="navTo('cartoes',null)">
+        <div class="c-icon ci-blue"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="6" width="16" height="11" rx="2" stroke="#4b9ef0" stroke-width="1.5"/><line x1="3" y1="10" x2="19" y2="10" stroke="#4b9ef0" stroke-width="1.5"/><path d="M6 14h3" stroke="#4b9ef0" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <h3>Cartões e crédito</h3><p>Melhores cartões por perfil, cashback, milhas, contas digitais, empréstimos e financiamentos.</p><span class="pill p-b">iDinheiro-style</span>
+      </div>
+      <div class="card" onclick="navTo('educacao',null)">
+        <div class="c-icon ci-green"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 7l8-4 8 4v6c0 4-8 7-8 7S3 17 3 13V7z" stroke="#87a54b" stroke-width="1.5"/><path d="M9 11l2 2 4-4" stroke="#87a54b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Educação financeira</h3><p>Guias completos, trilhas iniciante → avançado, glossário e tabelas macroeconômicas.</p><span class="pill p-g">Clube dos Poupadores</span>
+      </div>
+      <div class="card" onclick="navTo('ferramentas',null)">
+        <div class="c-icon ci-red"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M5 17l3-3 3 2.5 6-7" stroke="#f08080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="5" r="2" stroke="#f08080" stroke-width="1.5"/><circle cx="17" cy="5" r="2" stroke="#f08080" stroke-width="1.5"/></svg></div>
+        <h3>Ferramentas</h3><p>Calculadoras, simuladores, comparadores, tabelas e planilhas gratuitas para download.</p><span class="pill p-r">15+ ferramentas</span>
+      </div>
+      <div class="card" onclick="navTo('newsletter',null)">
+        <div class="c-icon ci-green"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="12" rx="2" stroke="#87a54b" stroke-width="1.5"/><path d="M3 8l8 5.5L19 8" stroke="#87a54b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <h3>Newsletter semanal</h3><p>Taxas, análises e oportunidades toda segunda-feira em 5 minutos de leitura.</p><span class="pill p-g">+12k leitores</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ INVESTIMENTOS ════════════════ -->
+<div id="page-investimentos" class="page">
+  <div class="section">
+    <div class="sec-hd">
+      <div><div class="sec-title">Simuladores de investimento</div><div class="sec-sub">CDI em tempo real: <span id="sim-cdi-label">14,65%</span> a.a. · Selic: <span id="sim-selic-label">14,75%</span> a.a.</div></div>
+    </div>
+
+    <!-- Seção tabs -->
+    <div class="inv-section-tabs">
+      <button class="ist active" onclick="invSection('rf',this)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 6h6M5 8.5h6M5 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Renda Fixa
+      </button>
+      <button class="ist" onclick="invSection('acoes',this)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12V7M6 12V4M10 12V8M14 12V2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Ações
+      </button>
+      <button class="ist" onclick="invSection('fiis',this)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="8" width="4" height="6" stroke="currentColor" stroke-width="1.4"/><rect x="6" y="5" width="4" height="9" stroke="currentColor" stroke-width="1.4"/><rect x="10" y="3" width="4" height="11" stroke="currentColor" stroke-width="1.4"/><path d="M1 14h14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        FIIs
+      </button>
+    </div>
+
+    <!-- ── RENDA FIXA ── -->
+    <div id="inv-rf" class="inv-section active">
+      <div class="calc-wrap">
+        <div class="calc-header">
+          <div class="calc-title-row">
+            <span class="calc-title">Simuladores de Renda Fixa</span>
+            <span class="api-tag"><span class="live-dot"></span> API BCB ao vivo</span>
+          </div>
+          <div class="calc-tabs">
+            <button class="calc-tab active" onclick="simTab('cdb',this)">CDB</button>
+            <button class="calc-tab" onclick="simTab('lci',this)">LCI / LCA</button>
+            <button class="calc-tab" onclick="simTab('t-selic',this)">Tesouro Selic</button>
+            <button class="calc-tab" onclick="simTab('t-prefixado',this)">Prefixado</button>
+            <button class="calc-tab" onclick="simTab('t-ipca',this)">IPCA+</button>
+            <button class="calc-tab" onclick="simTab('comparar',this)">Qual rende mais?</button>
+            <button class="calc-tab" onclick="simTab('compostos',this)">Juros compostos</button>
+            <button class="calc-tab" onclick="simTab('independencia',this)">Independência financeira</button>
+            <button class="calc-tab" onclick="simTab('patrimonio',this)">Patrimônio alvo</button>
+          </div>
+        </div>
+        <div class="calc-body">
+
+          <!-- CDB -->
+          <div id="sim-cdb" class="calc-panel active">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="cdb-val" value="10000" oninput="calcCDB()"></div>
+              <div class="fg"><label>Prazo (meses)</label><input type="number" id="cdb-prazo" value="12" min="1" oninput="calcCDB()"></div>
+              <div class="fg"><label>% do CDI</label><input type="number" id="cdb-pct" value="110" step="5" oninput="calcCDB()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Rendimento líquido (após IR)</div>
+              <div class="rb-val" id="cdb-rv">—</div>
+              <div class="rb-detail" id="cdb-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Bruto</div><div class="mv" id="cdb-bruto">—</div></div>
+                <div class="rb-mini"><div class="ml">IR retido</div><div class="mv red" id="cdb-ir">—</div></div>
+                <div class="rb-mini"><div class="ml">Líquido</div><div class="mv green" id="cdb-liq">—</div></div>
+                <div class="rb-mini"><div class="ml">Saldo final</div><div class="mv" id="cdb-saldo">—</div></div>
+                <div class="rb-mini"><div class="ml">Taxa líquida a.a.</div><div class="mv" id="cdb-taxaliq">—</div></div>
+                <div class="rb-mini"><div class="ml">Alíquota IR</div><div class="mv" id="cdb-aliq">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">IOF para resgates antes de 30 dias</div><p>Incide IOF regressivo de até 96% do rendimento no 1º dia. Após 30 dias, apenas IR regressivo. Planeje bem o prazo.</p></div>
+          </div>
+
+          <!-- LCI/LCA -->
+          <div id="sim-lci" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="lci-val" value="10000" oninput="calcLCI()"></div>
+              <div class="fg"><label>Prazo (meses)</label><input type="number" id="lci-prazo" value="12" min="3" oninput="calcLCI()"></div>
+              <div class="fg"><label>% do CDI</label><input type="number" id="lci-pct" value="93" step="1" oninput="calcLCI()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Rendimento líquido (isento de IR)</div>
+              <div class="rb-val" id="lci-rv">—</div>
+              <div class="rb-detail" id="lci-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Rendimento</div><div class="mv green" id="lci-rend">—</div></div>
+                <div class="rb-mini"><div class="ml">IR retido</div><div class="mv">R$ 0</div></div>
+                <div class="rb-mini"><div class="ml">Saldo final</div><div class="mv" id="lci-saldo">—</div></div>
+                <div class="rb-mini"><div class="ml">Taxa líquida a.a.</div><div class="mv" id="lci-taxaliq">—</div></div>
+                <div class="rb-mini"><div class="ml">Equivale a CDB</div><div class="mv green" id="lci-equiv">—</div></div>
+                <div class="rb-mini"><div class="ml">Melhor que CDB 110%?</div><div class="mv green" id="lci-melhor">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Equivalência LCI vs CDB</div><p id="lci-tip-text">Calculando equivalência…</p></div>
+          </div>
+
+          <!-- Tesouro Selic -->
+          <div id="sim-t-selic" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="ts-val" value="10000" oninput="calcTS()"></div>
+              <div class="fg"><label>Prazo (meses)</label><input type="number" id="ts-prazo" value="12" oninput="calcTS()"></div>
+              <div class="fg"><label>Selic atual (%)</label><input type="number" id="ts-selic" value="14.75" step="0.25" oninput="calcTS()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Tesouro Selic — rendimento estimado</div>
+              <div class="rb-val" id="ts-rv">—</div>
+              <div class="rb-detail" id="ts-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Bruto</div><div class="mv" id="ts-bruto">—</div></div>
+                <div class="rb-mini"><div class="ml">Taxa custódia</div><div class="mv red">- 0,20%</div></div>
+                <div class="rb-mini"><div class="ml">IR retido</div><div class="mv red" id="ts-ir">—</div></div>
+                <div class="rb-mini"><div class="ml">Líquido</div><div class="mv green" id="ts-liq">—</div></div>
+                <div class="rb-mini"><div class="ml">Taxa líquida a.a.</div><div class="mv" id="ts-taxaliq">—</div></div>
+                <div class="rb-mini"><div class="ml">Saldo final</div><div class="mv" id="ts-saldo">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Melhor reserva de emergência</div><p>Liquidez diária garantida pelo Tesouro Nacional. Taxa de custódia de 0,20% a.a. Ideal para reserva de emergência e capital de giro.</p></div>
+          </div>
+
+          <!-- Prefixado -->
+          <div id="sim-t-prefixado" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="tp-val" value="10000" oninput="calcTP()"></div>
+              <div class="fg"><label>Prazo (anos)</label><input type="number" id="tp-prazo" value="3" step="1" oninput="calcTP()"></div>
+              <div class="fg"><label>Taxa prefixada (% a.a.)</label><input type="number" id="tp-taxa" value="14.5" step="0.25" oninput="calcTP()"></div>
+              <div class="fg"><label>Selic esperada no venc. (%)</label><input type="number" id="tp-selic-est" value="12.0" step="0.25" oninput="calcTP()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Tesouro Prefixado — ao vencimento</div>
+              <div class="rb-val" id="tp-rv">—</div>
+              <div class="rb-detail" id="tp-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Bruto</div><div class="mv" id="tp-bruto">—</div></div>
+                <div class="rb-mini"><div class="ml">IR retido</div><div class="mv red" id="tp-ir">—</div></div>
+                <div class="rb-mini"><div class="ml">Líquido</div><div class="mv green" id="tp-liq">—</div></div>
+                <div class="rb-mini"><div class="ml">Saldo final</div><div class="mv" id="tp-saldo">—</div></div>
+                <div class="rb-mini"><div class="ml">Vs Selic esperada</div><div class="mv" id="tp-vsselic">—</div></div>
+                <div class="rb-mini"><div class="ml">Vantagem</div><div class="mv" id="tp-vant">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Risco de marcação a mercado</div><p>Se a Selic subir acima do prefixado, você perde se vender antes do vencimento. Se cair, o título se valoriza. Levado ao vencimento, o retorno é garantido.</p></div>
+          </div>
+
+          <!-- IPCA+ -->
+          <div id="sim-t-ipca" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="ti-val" value="10000" oninput="calcTI()"></div>
+              <div class="fg"><label>Prazo (anos)</label><input type="number" id="ti-prazo" value="10" oninput="calcTI()"></div>
+              <div class="fg"><label>Taxa real (% a.a.)</label><input type="number" id="ti-taxa" value="7.5" step="0.1" oninput="calcTI()"></div>
+              <div class="fg"><label>IPCA estimado (% a.a.)</label><input type="number" id="ti-ipca" value="5.48" step="0.1" oninput="calcTI()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Tesouro IPCA+ — ao vencimento</div>
+              <div class="rb-val" id="ti-rv">—</div>
+              <div class="rb-detail" id="ti-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Taxa nominal</div><div class="mv" id="ti-nom">—</div></div>
+                <div class="rb-mini"><div class="ml">Bruto</div><div class="mv" id="ti-bruto">—</div></div>
+                <div class="rb-mini"><div class="ml">IR retido</div><div class="mv red" id="ti-ir">—</div></div>
+                <div class="rb-mini"><div class="ml">Ganho real líquido</div><div class="mv green" id="ti-real">—</div></div>
+                <div class="rb-mini"><div class="ml">Poder de compra</div><div class="mv green" id="ti-poder">—</div></div>
+                <div class="rb-mini"><div class="ml">Saldo final</div><div class="mv" id="ti-saldo">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Proteção real garantida</div><p>Com Selic em 14,75%, o Tesouro IPCA+ oferece taxas reais acima de 7% a.a. — nível historicamente elevado. Quem travar hoje garante crescimento acima da inflação por décadas.</p></div>
+          </div>
+
+          <!-- Comparar -->
+          <div id="sim-comparar" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="cp-val" value="10000" oninput="calcCompar()"></div>
+              <div class="fg"><label>Prazo (meses)</label><input type="number" id="cp-prazo" value="12" oninput="calcCompar()"></div>
+              <div class="fg"><label>% CDI (CDB)</label><input type="number" id="cp-pct" value="110" step="5" oninput="calcCompar()"></div>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="comp-table" style="margin-top:0"><thead><tr><th>Produto</th><th>Bruto</th><th>IR</th><th>Líquido</th><th>Taxa líq. a.a.</th><th>#</th></tr></thead><tbody id="comp-tbody"></tbody></table>
+            </div>
+            <div class="tip" id="comp-tip"><div class="tip-t">Resultado</div><p id="comp-tip-text">Calculando…</p></div>
+          </div>
+
+          <!-- Juros compostos -->
+          <div id="sim-compostos" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Capital inicial (R$)</label><input type="number" id="jc-cap" value="5000" oninput="calcJC()"></div>
+              <div class="fg"><label>Aporte mensal (R$)</label><input type="number" id="jc-ap" value="500" oninput="calcJC()"></div>
+              <div class="fg"><label>Taxa anual (%)</label><input type="number" id="jc-taxa" value="14.65" step="0.5" oninput="calcJC()"></div>
+              <div class="fg"><label>Período (anos)</label><input type="number" id="jc-anos" value="10" oninput="calcJC()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Patrimônio acumulado</div>
+              <div class="rb-val" id="jc-rv">—</div>
+              <div class="rb-detail" id="jc-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Total investido</div><div class="mv" id="jc-inv">—</div></div>
+                <div class="rb-mini"><div class="ml">Rendimentos</div><div class="mv green" id="jc-rend">—</div></div>
+                <div class="rb-mini"><div class="ml">Retorno s/ invest.</div><div class="mv" id="jc-ret">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda mensal (4%)</div><div class="mv green" id="jc-renda">—</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Independência financeira -->
+          <div id="sim-independencia" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Renda mensal desejada (R$)</label><input type="number" id="if-renda" value="15000" oninput="calcIF()"></div>
+              <div class="fg"><label>Aporte mensal (R$)</label><input type="number" id="if-ap" value="3000" oninput="calcIF()"></div>
+              <div class="fg"><label>Capital atual (R$)</label><input type="number" id="if-cap" value="50000" oninput="calcIF()"></div>
+              <div class="fg"><label>Taxa anual (%)</label><input type="number" id="if-taxa" value="14.65" step="0.5" oninput="calcIF()"></div>
+              <div class="fg"><label>Taxa de retirada (%)</label><input type="number" id="if-retirada" value="4" step="0.5" oninput="calcIF()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Independência financeira em</div>
+              <div class="rb-val" id="if-rv">—</div>
+              <div class="rb-detail" id="if-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Patrimônio alvo</div><div class="mv" id="if-meta">—</div></div>
+                <div class="rb-mini"><div class="ml">Anos necessários</div><div class="mv" id="if-anos">—</div></div>
+                <div class="rb-mini"><div class="ml">Total investido</div><div class="mv" id="if-inv">—</div></div>
+                <div class="rb-mini"><div class="ml">Multiplicador</div><div class="mv green" id="if-mult">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Regra dos 4%</div><p>Se você retira 4% do patrimônio por ano, ele dura indefinidamente (SWR histórico). Patrimônio necessário = renda desejada × 12 / taxa de retirada.</p></div>
+          </div>
+
+          <!-- Patrimônio alvo -->
+          <div id="sim-patrimonio" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Patrimônio desejado (R$)</label><input type="number" id="pa-meta" value="2000000" oninput="calcPA()"></div>
+              <div class="fg"><label>Aporte mensal (R$)</label><input type="number" id="pa-ap" value="2000" oninput="calcPA()"></div>
+              <div class="fg"><label>Capital inicial (R$)</label><input type="number" id="pa-cap" value="20000" oninput="calcPA()"></div>
+              <div class="fg"><label>Taxa anual (%)</label><input type="number" id="pa-taxa" value="14.65" step="0.5" oninput="calcPA()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Você atingirá seu patrimônio alvo em</div>
+              <div class="rb-val" id="pa-rv">—</div>
+              <div class="rb-detail" id="pa-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Anos</div><div class="mv" id="pa-anos">—</div></div>
+                <div class="rb-mini"><div class="ml">Meses</div><div class="mv" id="pa-meses">—</div></div>
+                <div class="rb-mini"><div class="ml">Total investido</div><div class="mv" id="pa-inv">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda (4%)</div><div class="mv green" id="pa-renda">—</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AÇÕES ── -->
+    <div id="inv-acoes" class="inv-section">
+      <div class="inv-section-intro">
+        <div class="isi-icon" style="background:rgba(75,158,240,0.15)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 3 5-7 3 2" stroke="#4b9ef0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div>
+          <div class="isi-title">Renda Variável — Ações</div>
+          <div class="isi-sub">Ibovespa: <strong id="acoes-ibov">198.000 pts</strong> · Simuladores para apoiar suas decisões de longo prazo</div>
+        </div>
+      </div>
+      <div class="calc-wrap">
+        <div class="calc-header">
+          <div class="calc-title-row"><span class="calc-title">Simuladores de Ações</span><span class="api-tag"><span class="live-dot"></span> Dados de mercado</span></div>
+          <div class="calc-tabs">
+            <button class="calc-tab active" onclick="acoesTab('dividendos',this)">Dividendos</button>
+            <button class="calc-tab" onclick="acoesTab('preco-justo',this)">Preço justo</button>
+            <button class="calc-tab" onclick="acoesTab('dy-necessario',this)">DY necessário</button>
+            <button class="calc-tab" onclick="acoesTab('carteira-acoes',this)">Carteira</button>
+            <button class="calc-tab" onclick="acoesTab('rf-vs-rv',this)">RF vs Ações</button>
+          </div>
+        </div>
+        <div class="calc-body">
+
+          <div id="ac-dividendos" class="calc-panel active">
+            <div class="form-row">
+              <div class="fg"><label>Valor investido (R$)</label><input type="number" id="ac-val" value="50000" oninput="calcDY()"></div>
+              <div class="fg"><label>Dividend Yield anual (%)</label><input type="number" id="ac-dy" value="6.5" step="0.5" oninput="calcDY()"></div>
+              <div class="fg"><label>Crescimento dividendos (% a.a.)</label><input type="number" id="ac-crescimento" value="8" step="1" oninput="calcDY()"></div>
+              <div class="fg"><label>Horizonte (anos)</label><input type="number" id="ac-anos" value="10" oninput="calcDY()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Renda de dividendos</div>
+              <div class="rb-val" id="dy-rv">—</div>
+              <div class="rb-detail" id="dy-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Dividendo mensal hoje</div><div class="mv green" id="dy-mes">—</div></div>
+                <div class="rb-mini"><div class="ml">Dividendo mensal em <span id="dy-ano-fut">10</span> anos</div><div class="mv green" id="dy-mes-fut">—</div></div>
+                <div class="rb-mini"><div class="ml">Total recebido</div><div class="mv" id="dy-total">—</div></div>
+                <div class="rb-mini"><div class="ml">YoC (yield on cost)</div><div class="mv green" id="dy-yoc">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Yield on Cost (YoC)</div><p>É o DY calculado sobre o seu preço de compra original — não o preço atual. Com crescimento de dividendos, o YoC aumenta a cada ano mesmo sem novos aportes.</p></div>
+          </div>
+
+          <div id="ac-preco-justo" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>LPA — Lucro por ação (R$)</label><input type="number" id="pj-lpa" value="5.00" step="0.1" oninput="calcPJ()"></div>
+              <div class="fg"><label>VPA — Valor patrimonial (R$)</label><input type="number" id="pj-vpa" value="25.00" step="0.1" oninput="calcPJ()"></div>
+              <div class="fg"><label>P/L justo (setor)</label><input type="number" id="pj-pl" value="12" step="1" oninput="calcPJ()"></div>
+              <div class="fg"><label>Crescimento esperado (% a.a.)</label><input type="number" id="pj-cresc" value="10" step="1" oninput="calcPJ()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Preço justo estimado</div>
+              <div class="rb-val" id="pj-rv">—</div>
+              <div class="rb-detail" id="pj-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Graham (√(22,5×LPA×VPA))</div><div class="mv green" id="pj-graham">—</div></div>
+                <div class="rb-mini"><div class="ml">Por P/L</div><div class="mv" id="pj-pl-val">—</div></div>
+                <div class="rb-mini"><div class="ml">DCF simplificado</div><div class="mv" id="pj-dcf">—</div></div>
+                <div class="rb-mini"><div class="ml">Média dos 3 métodos</div><div class="mv green" id="pj-media">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Fórmula de Graham</div><p>Benjamin Graham sugeriu: preço justo = √(22,5 × LPA × VPA). É uma estimativa conservadora — use junto com análise fundamentalista completa.</p></div>
+          </div>
+
+          <div id="ac-dy-necessario" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Renda mensal desejada (R$)</label><input type="number" id="dn-renda" value="5000" oninput="calcDN()"></div>
+              <div class="fg"><label>Capital disponível (R$)</label><input type="number" id="dn-capital" value="500000" oninput="calcDN()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Dividend Yield necessário</div>
+              <div class="rb-val" id="dn-rv">—</div>
+              <div class="rb-detail" id="dn-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">DY anual necessário</div><div class="mv green" id="dn-dy-ano">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda mensal</div><div class="mv green" id="dn-renda-r">—</div></div>
+                <div class="rb-mini"><div class="ml">Capital p/ DY 6%</div><div class="mv" id="dn-cap6">—</div></div>
+                <div class="rb-mini"><div class="ml">Capital p/ DY 8%</div><div class="mv" id="dn-cap8">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Tributação de dividendos</div><p>Dividendos de ações brasileiras são atualmente isentos de IR para pessoa física. Juros sobre capital próprio (JCP) têm retenção de 15% na fonte.</p></div>
+          </div>
+
+          <div id="ac-carteira-acoes" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Capital total (R$)</label><input type="number" id="ca-cap" value="100000" oninput="calcCarteira()"></div>
+              <div class="fg"><label>% em dividendos</label><input type="number" id="ca-div" value="40" step="5" oninput="calcCarteira()"></div>
+              <div class="fg"><label>% em crescimento</label><input type="number" id="ca-cresc" value="40" step="5" oninput="calcCarteira()"></div>
+              <div class="fg"><label>% em small caps</label><input type="number" id="ca-small" value="20" step="5" oninput="calcCarteira()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Alocação sugerida de carteira</div>
+              <div class="rb-val" id="ca-rv">—</div>
+              <div class="rb-detail" id="ca-det">Distribuição por perfil</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Dividendos (ITUB, BBAS…)</div><div class="mv green" id="ca-div-r">—</div></div>
+                <div class="rb-mini"><div class="ml">Crescimento (WEGE, RENT…)</div><div class="mv" id="ca-cresc-r">—</div></div>
+                <div class="rb-mini"><div class="ml">Small caps</div><div class="mv" id="ca-small-r">—</div></div>
+                <div class="rb-mini"><div class="ml">DY médio estimado</div><div class="mv green" id="ca-dy-medio">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Diversificação setorial</div><p>Uma carteira equilibrada mistura pagadoras de dividendos (bancos, energia, saneamento), empresas de crescimento e small caps para capturar diferentes estágios do ciclo econômico.</p></div>
+          </div>
+
+          <div id="ac-rf-vs-rv" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="rv-val" value="50000" oninput="calcRFvsRV()"></div>
+              <div class="fg"><label>Retorno ações (% a.a.)</label><input type="number" id="rv-acoes" value="14" step="1" oninput="calcRFvsRV()"></div>
+              <div class="fg"><label>Retorno RF (% CDI)</label><input type="number" id="rv-rf-pct" value="110" step="5" oninput="calcRFvsRV()"></div>
+              <div class="fg"><label>Horizonte (anos)</label><input type="number" id="rv-anos" value="10" oninput="calcRFvsRV()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Renda fixa vs ações em <span id="rv-ano-fut">10</span> anos</div>
+              <div class="rb-val" id="rv-rv">—</div>
+              <div class="rb-detail" id="rv-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Renda fixa (líquido)</div><div class="mv" id="rv-rf-r">—</div></div>
+                <div class="rb-mini"><div class="ml">Ações (estimado)</div><div class="mv green" id="rv-ac-r">—</div></div>
+                <div class="rb-mini"><div class="ml">Diferença</div><div class="mv" id="rv-diff">—</div></div>
+                <div class="rb-mini"><div class="ml">Prêmio de risco</div><div class="mv" id="rv-premio">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Prêmio de risco de ações</div><p>Com CDI a 14,65%, ações precisam render mais do que isso para compensar o risco adicional. O prêmio histórico das ações sobre a renda fixa no Brasil é de ~4% a 6% a.a. ao longo de décadas.</p></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FIIs ── -->
+    <div id="inv-fiis" class="inv-section">
+      <div class="inv-section-intro">
+        <div class="isi-icon" style="background:rgba(232,169,64,0.15)"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="9" width="3" height="9" stroke="#e8a940" stroke-width="1.4"/><rect x="6" y="6" width="3" height="12" stroke="#e8a940" stroke-width="1.4"/><rect x="10" y="4" width="3" height="14" stroke="#e8a940" stroke-width="1.4"/><rect x="14" y="7" width="3" height="11" stroke="#e8a940" stroke-width="1.4"/><path x1="1" y1="18" x2="18" y2="18" d="M1 18h20" stroke="#e8a940" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div>
+          <div class="isi-title">Fundos de Investimento Imobiliário (FIIs)</div>
+          <div class="isi-sub">Renda mensal isenta de IR · Isentos para PF com menos de 10% do fundo e fundo com mais de 50 cotistas</div>
+        </div>
+      </div>
+      <div class="calc-wrap">
+        <div class="calc-header">
+          <div class="calc-title-row"><span class="calc-title">Simuladores de FIIs</span><span class="api-tag"><span class="live-dot"></span> Isento IR · Renda mensal</span></div>
+          <div class="calc-tabs">
+            <button class="calc-tab active" onclick="fiisTab('renda-fii',this)">Renda mensal</button>
+            <button class="calc-tab" onclick="fiisTab('capital-fii',this)">Capital necessário</button>
+            <button class="calc-tab" onclick="fiisTab('fii-vs-imovel',this)">FII vs Imóvel físico</button>
+            <button class="calc-tab" onclick="fiisTab('fii-vs-cdb',this)">FII vs CDB</button>
+            <button class="calc-tab" onclick="fiisTab('p-vp',this)">P/VP justo</button>
+          </div>
+        </div>
+        <div class="calc-body">
+
+          <div id="fii-renda-fii" class="calc-panel active">
+            <div class="form-row">
+              <div class="fg"><label>Valor investido (R$)</label><input type="number" id="fii-val" value="100000" oninput="calcFIIRenda()"></div>
+              <div class="fg"><label>DY mensal médio (%)</label><input type="number" id="fii-dy-mes" value="0.85" step="0.05" oninput="calcFIIRenda()"></div>
+              <div class="fg"><label>Aportes mensais (R$)</label><input type="number" id="fii-ap" value="1000" oninput="calcFIIRenda()"></div>
+              <div class="fg"><label>Horizonte (anos)</label><input type="number" id="fii-anos" value="10" oninput="calcFIIRenda()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Renda mensal de FIIs</div>
+              <div class="rb-val" id="fii-rv">—</div>
+              <div class="rb-detail" id="fii-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Renda hoje</div><div class="mv green" id="fii-renda-hoje">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda em <span id="fii-ano-fut">10</span> anos</div><div class="mv green" id="fii-renda-fut">—</div></div>
+                <div class="rb-mini"><div class="ml">DY anual</div><div class="mv" id="fii-dy-ano">—</div></div>
+                <div class="rb-mini"><div class="ml">IR retido</div><div class="mv green">R$ 0 (isento)</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Isenção de IR para PF</div><p>Proventos de FIIs são isentos de IR para pessoa física desde que o fundo tenha mais de 50 cotistas e seja listado em bolsa. Ganho de capital na venda de cotas é tributado em 20%.</p></div>
+          </div>
+
+          <div id="fii-capital-fii" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Renda mensal desejada (R$)</label><input type="number" id="fc-renda" value="5000" oninput="calcFIICap()"></div>
+              <div class="fg"><label>DY mensal esperado (%)</label><input type="number" id="fc-dy" value="0.85" step="0.05" oninput="calcFIICap()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Capital necessário em FIIs</div>
+              <div class="rb-val" id="fc-rv">—</div>
+              <div class="rb-detail" id="fc-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Capital (DY atual)</div><div class="mv green" id="fc-cap">—</div></div>
+                <div class="rb-mini"><div class="ml">DY anual implícito</div><div class="mv" id="fc-dy-ano">—</div></div>
+                <div class="rb-mini"><div class="ml">Capital se DY = 1%/mês</div><div class="mv" id="fc-cap1">—</div></div>
+                <div class="rb-mini"><div class="ml">Capital se DY = 0,7%/mês</div><div class="mv" id="fc-cap07">—</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="fii-fii-vs-imovel" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor do imóvel (R$)</label><input type="number" id="fi-val" value="500000" oninput="calcFIIvsImovel()"></div>
+              <div class="fg"><label>Aluguel mensal (R$)</label><input type="number" id="fi-aluguel" value="2500" oninput="calcFIIvsImovel()"></div>
+              <div class="fg"><label>DY FII (% mensal)</label><input type="number" id="fi-dy" value="0.85" step="0.05" oninput="calcFIIvsImovel()"></div>
+              <div class="fg"><label>Valorização imóvel (% a.a.)</label><input type="number" id="fi-valorizacao" value="5" step="0.5" oninput="calcFIIvsImovel()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">FII vs Imóvel físico</div>
+              <div class="rb-val" id="fi-rv">—</div>
+              <div class="rb-detail" id="fi-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Yield imóvel (aluguel)</div><div class="mv" id="fi-yield-im">—</div></div>
+                <div class="rb-mini"><div class="ml">Yield FII (anual)</div><div class="mv green" id="fi-yield-fii">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda imóvel (após IR 27,5%)</div><div class="mv" id="fi-renda-im">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda FII (isento)</div><div class="mv green" id="fi-renda-fii">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">Vantagens dos FIIs vs imóvel físico</div><p>FIIs têm liquidez diária, sem ITBI, sem escritura, sem reforma, gestão profissional, renda isenta de IR e diversificação com valores a partir de R$ 10. O imóvel físico oferece maior controle e proteção contra inflação via valorização.</p></div>
+          </div>
+
+          <div id="fii-fii-vs-cdb" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Valor (R$)</label><input type="number" id="fvc-val" value="100000" oninput="calcFIIvsCDB()"></div>
+              <div class="fg"><label>DY FII (% mensal)</label><input type="number" id="fvc-dy" value="0.85" step="0.05" oninput="calcFIIvsCDB()"></div>
+              <div class="fg"><label>CDB (% CDI)</label><input type="number" id="fvc-cdb" value="110" step="5" oninput="calcFIIvsCDB()"></div>
+              <div class="fg"><label>Prazo (meses)</label><input type="number" id="fvc-prazo" value="12" oninput="calcFIIvsCDB()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">FII vs CDB — renda no período</div>
+              <div class="rb-val" id="fvc-rv">—</div>
+              <div class="rb-detail" id="fvc-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">Renda FII (isento)</div><div class="mv green" id="fvc-fii-r">—</div></div>
+                <div class="rb-mini"><div class="ml">Renda CDB (líquido)</div><div class="mv" id="fvc-cdb-r">—</div></div>
+                <div class="rb-mini"><div class="ml">FII vence?</div><div class="mv" id="fvc-vence">—</div></div>
+                <div class="rb-mini"><div class="ml">Diferença</div><div class="mv" id="fvc-diff">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">FII vs CDB: qual escolher?</div><p>CDB tem rentabilidade previsível e garantia do FGC até R$ 250k. FIIs têm maior potencial de renda passiva isenta de IR, mas com risco de vacância, gestão e oscilação de preço das cotas.</p></div>
+          </div>
+
+          <div id="fii-p-vp" class="calc-panel">
+            <div class="form-row">
+              <div class="fg"><label>Preço da cota (R$)</label><input type="number" id="pvp-preco" value="95" step="1" oninput="calcPVP()"></div>
+              <div class="fg"><label>Valor patrimonial da cota (R$)</label><input type="number" id="pvp-vp" value="100" step="1" oninput="calcPVP()"></div>
+              <div class="fg"><label>Dividend yield mensal (%)</label><input type="number" id="pvp-dy" value="0.90" step="0.05" oninput="calcPVP()"></div>
+            </div>
+            <div class="result-box">
+              <div class="rb-label">Análise de P/VP</div>
+              <div class="rb-val" id="pvp-rv">—</div>
+              <div class="rb-detail" id="pvp-det">Calculando…</div>
+              <div class="rb-grid">
+                <div class="rb-mini"><div class="ml">P/VP atual</div><div class="mv" id="pvp-ratio">—</div></div>
+                <div class="rb-mini"><div class="ml">Desconto/prêmio</div><div class="mv green" id="pvp-desc">—</div></div>
+                <div class="rb-mini"><div class="ml">DY sobre preço</div><div class="mv green" id="pvp-dy-preco">—</div></div>
+                <div class="rb-mini"><div class="ml">DY sobre VP</div><div class="mv" id="pvp-dy-vp">—</div></div>
+              </div>
+            </div>
+            <div class="tip"><div class="tip-t">O que é P/VP?</div><p>P/VP = preço da cota ÷ valor patrimonial. P/VP abaixo de 1 significa que você está comprando o ativo por menos do que vale no papel — potencial de valorização. Acima de 1, você paga prêmio pela qualidade da gestão.</p></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════ AVANÇADO ════════════════ -->
+<div id="page-avancado" class="page">
+  <div class="section">
+    <div class="sec-hd"><div><div class="sec-title">Renda fixa avançada</div><div class="sec-sub">Ferramentas que fazem a diferença na hora de investir de verdade</div></div></div>
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <div class="calc-title-row"><span class="calc-title">Análises avançadas</span><span class="api-tag"><span class="live-dot"></span> Dados BCB</span></div>
+        <div class="calc-tabs">
+          <button class="calc-tab active" onclick="avTab('bruto-liq',this)">Bruto vs líquido</button>
+          <button class="calc-tab" onclick="avTab('ir-iof',this)">IR e IOF</button>
+          <button class="calc-tab" onclick="avTab('equiv',this)">Equivalência de taxas</button>
+          <button class="calc-tab" onclick="avTab('taxa-real',this)">Taxa real</button>
+          <button class="calc-tab" onclick="avTab('vs-inflacao',this)">Vs inflação</button>
+          <button class="calc-tab" onclick="avTab('marcacao',this)">Marcação a mercado</button>
+        </div>
+      </div>
+      <div class="calc-body">
+
+        <div id="av-bruto-liq" class="calc-panel active">
+          <div class="form-row">
+            <div class="fg"><label>Valor investido (R$)</label><input type="number" id="bl-val" value="50000" oninput="calcBL()"></div>
+            <div class="fg"><label>Taxa bruta a.a. (%)</label><input type="number" id="bl-taxa" value="11" step="0.25" oninput="calcBL()"></div>
+            <div class="fg"><label>Prazo (meses)</label><input type="number" id="bl-prazo" value="24" oninput="calcBL()"></div>
+            <div class="fg"><label>Tipo</label><select id="bl-tipo" onchange="calcBL()"><option value="cdb">CDB (IR regressivo)</option><option value="lci">LCI/LCA (isento)</option></select></div>
+          </div>
+          <div class="result-box">
+            <div class="rb-label">Comparativo bruto × líquido</div>
+            <div class="rb-val" id="bl-rv">R$ 9.348 <span>líquido</span></div>
+            <div class="rb-grid">
+              <div class="rb-mini"><div class="ml">Rendimento bruto</div><div class="mv" id="bl-bruto">R$ 11.318</div></div>
+              <div class="rb-mini"><div class="ml">IR retido</div><div class="mv red" id="bl-ir">- R$ 1.980</div></div>
+              <div class="rb-mini"><div class="ml">IOF (se < 30d)</div><div class="mv red">até 96%</div></div>
+              <div class="rb-mini"><div class="ml">Líquido real</div><div class="mv green" id="bl-liq">R$ 9.338</div></div>
+              <div class="rb-mini"><div class="ml">Taxa bruta a.a.</div><div class="mv" id="bl-taxab">11,00%</div></div>
+              <div class="rb-mini"><div class="ml">Taxa líquida a.a.</div><div class="mv green" id="bl-taxal">9,24%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="av-ir-iof" class="calc-panel">
+          <div class="form-row">
+            <div class="fg"><label>Rendimento bruto (R$)</label><input type="number" id="ii-rend" value="5000" oninput="calcIIOF()"></div>
+            <div class="fg"><label>Dias aplicado</label><input type="number" id="ii-dias" value="365" oninput="calcIIOF()"></div>
+          </div>
+          <div class="result-box">
+            <div class="rb-label">IR + IOF sobre o rendimento</div>
+            <div class="rb-val" id="ii-rv">R$ 4.125 <span>líquido</span></div>
+            <div class="rb-grid">
+              <div class="rb-mini"><div class="ml">Rendimento bruto</div><div class="mv">R$ 5.000</div></div>
+              <div class="rb-mini"><div class="ml">IOF (%)</div><div class="mv red" id="ii-iof-pct">0%</div></div>
+              <div class="rb-mini"><div class="ml">IOF (R$)</div><div class="mv red" id="ii-iof-r">R$ 0</div></div>
+              <div class="rb-mini"><div class="ml">IR (%)</div><div class="mv red" id="ii-ir-pct">17,5%</div></div>
+              <div class="rb-mini"><div class="ml">IR (R$)</div><div class="mv red" id="ii-ir-r">R$ 875</div></div>
+              <div class="rb-mini"><div class="ml">Líquido</div><div class="mv green" id="ii-liq">R$ 4.125</div></div>
+            </div>
+          </div>
+          <div class="tip"><div class="tip-t">Tabela IOF e IR</div><p>IOF: dia 1 = 96%, dia 2 = 93%… dia 30 = 3%, dia 31+ = 0%. IR: até 180d = 22,5% · 181-360d = 20% · 361-720d = 17,5% · acima 720d = 15%.</p></div>
+        </div>
+
+        <div id="av-equiv" class="calc-panel">
+          <div class="form-row">
+            <div class="fg"><label>Taxa LCI/LCA (% CDI ou % a.a.)</label><input type="number" id="eq-lci" value="93" step="0.5" oninput="calcEquiv()"></div>
+            <div class="fg"><label>Tipo entrada</label><select id="eq-tipo" onchange="calcEquiv()"><option value="pct">% do CDI</option><option value="aa">% a.a. nominal</option></select></div>
+            <div class="fg"><label>Prazo (para calcular IR)</label><select id="eq-prazo" onchange="calcEquiv()"><option value="22.5">até 180 dias</option><option value="20">181-360 dias</option><option value="17.5" selected>361-720 dias</option><option value="15">acima de 720 dias</option></select></div>
+          </div>
+          <div class="result-box">
+            <div class="rb-label">Taxa isenta equivale a um CDB de…</div>
+            <div class="rb-val" id="eq-rv">112,7% CDI <span>bruto</span></div>
+            <div class="rb-detail" id="eq-det">LCI 93% CDI = CDB 112,7% CDI líquido (IR 17,5%)</div>
+            <div class="rb-grid">
+              <div class="rb-mini"><div class="ml">Taxa isenta</div><div class="mv" id="eq-isenta">9,67% a.a.</div></div>
+              <div class="rb-mini"><div class="ml">CDB equivalente</div><div class="mv green" id="eq-cdb">112,7% CDI</div></div>
+              <div class="rb-mini"><div class="ml">Taxa CDI equiv.</div><div class="mv green" id="eq-cdb-aa">11,72% a.a.</div></div>
+              <div class="rb-mini"><div class="ml">Alíquota IR</div><div class="mv" id="eq-aliq">17,5%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="av-taxa-real" class="calc-panel">
+          <div class="form-row">
+            <div class="fg"><label>Taxa nominal a.a. (%)</label><input type="number" id="tr-nom" value="10.5" step="0.25" oninput="calcTReal()"></div>
+            <div class="fg"><label>Inflação (IPCA) a.a. (%)</label><input type="number" id="tr-ipca" value="4.83" step="0.1" oninput="calcTReal()"></div>
+            <div class="fg"><label>IR aplicado (%)</label><input type="number" id="tr-ir" value="17.5" step="2.5" oninput="calcTReal()"></div>
+          </div>
+          <div class="result-box">
+            <div class="rb-label">Taxa real do investimento</div>
+            <div class="rb-val" id="tr-rv">+4,10% <span>ao ano acima da inflação</span></div>
+            <div class="rb-detail" id="tr-det">Taxa real líquida de IR e inflação</div>
+            <div class="rb-grid">
+              <div class="rb-mini"><div class="ml">Taxa nominal</div><div class="mv" id="tr-nom-r">10,50% a.a.</div></div>
+              <div class="rb-mini"><div class="ml">Taxa líquida (IR)</div><div class="mv" id="tr-liq">8,66% a.a.</div></div>
+              <div class="rb-mini"><div class="ml">Inflação (IPCA)</div><div class="mv red" id="tr-inf">4,83% a.a.</div></div>
+              <div class="rb-mini"><div class="ml">Taxa real líquida</div><div class="mv green" id="tr-real">+3,65% a.a.</div></div>
+            </div>
+          </div>
+          <div class="tip"><div class="tip-t">Fórmula: taxa real (Fisher)</div><p>Taxa real = (1 + taxa líquida) / (1 + inflação) - 1. Não é simplesmente subtrair — a fórmula de Fisher é mais precisa, especialmente em cenários de inflação alta.</p></div>
+        </div>
+
+        <div id="av-vs-inflacao" class="calc-panel">
+          <div class="form-row">
+            <div class="fg"><label>Valor atual (R$)</label><input type="number" id="vi-val" value="100000" oninput="calcVI()"></div>
+            <div class="fg"><label>Rendimento a.a. (%)</label><input type="number" id="vi-rend" value="10.5" step="0.25" oninput="calcVI()"></div>
+            <div class="fg"><label>IPCA a.a. (%)</label><input type="number" id="vi-ipca" value="4.83" step="0.1" oninput="calcVI()"></div>
+            <div class="fg"><label>Prazo (anos)</label><input type="number" id="vi-anos" value="10" oninput="calcVI()"></div>
+          </div>
+          <div class="result-box">
+            <div class="rb-label">Ganho real em <span id="vi-ano-fut">2035</span></div>
+            <div class="rb-val" id="vi-rv">R$ 169.824 <span>poder de compra adicional</span></div>
+            <div class="rb-grid">
+              <div class="rb-mini"><div class="ml">Saldo nominal</div><div class="mv" id="vi-nom">R$ 271.558</div></div>
+              <div class="rb-mini"><div class="ml">Correção inflação</div><div class="mv red" id="vi-inf-r">R$ 60.085</div></div>
+              <div class="rb-mini"><div class="ml">Ganho real</div><div class="mv green" id="vi-real-r">R$ 111.473</div></div>
+              <div class="rb-mini"><div class="ml">Poupança teria</div><div class="mv red" id="vi-poup-r">R$ 183.246</div></div>
+              <div class="rb-mini"><div class="ml">Poupança real</div><div class="mv red" id="vi-poup-real">R$ 122.000</div></div>
+              <div class="rb-mini"><div class="ml">Diferença</div><div class="mv green" id="vi-diff">+ R$ 88.312</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="av-marcacao" class="calc-panel">
+          <div class="form-row">
+            <div class="fg"><label>Valor de face (R$)</label><input type="number" id="mm-face" value="1000" oninput="calcMM()"></div>
+            <div class="fg"><label>Taxa compra (% a.a.)</label><input type="number" id="mm-taxa-c" value="13.5" step="0.25" oninput="calcMM()"></div>
+            <div class="fg"><label>Taxa mercado atual (% a.a.)</label><input type="number" id="mm-taxa-m" value="12.0" step="0.25" oninput="calcMM()"></div>
+            <div class="fg"><label>Anos até vencimento</label><input type="number" id="mm-anos" value="5" oninput="calcMM()"></div>
+          </div>
+          <div class="result-box">
+            <div class="rb-label">Valor de mercado do título hoje</div>
+            <div class="rb-val" id="mm-rv">R$ 1.067 <span>por R$ 1.000 de face</span></div>
+            <div class="rb-detail" id="mm-det">Taxa de compra > taxa atual → título valorizado</div>
+            <div class="rb-grid">
+              <div class="rb-mini"><div class="ml">Valor de face</div><div class="mv">R$ 1.000</div></div>
+              <div class="rb-mini"><div class="ml">Valor de mercado</div><div class="mv green" id="mm-mercado">R$ 1.067</div></div>
+              <div class="rb-mini"><div class="ml">Ganho antecipado</div><div class="mv green" id="mm-ganho">+ R$ 67</div></div>
+              <div class="rb-mini"><div class="ml">Ganho %</div><div class="mv green" id="mm-ganho-pct">+6,7%</div></div>
+            </div>
+          </div>
+          <div class="tip"><div class="tip-t">Como funciona a marcação a mercado</div><p>Quando a taxa de juros do mercado cai abaixo da taxa que você comprou, seu prefixado vale mais. Se as taxas subirem, vale menos. Ao vencimento, o valor de face é sempre pago — mas vendendo antes, você pode ganhar ou perder.</p></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ CARTÕES ════════════════ -->
+<div id="page-cartoes" class="page">
+  <div class="section">
+    <div class="sec-hd"><div><div class="sec-title">Cartões, contas e crédito</div><div class="sec-sub">Compare e encontre o melhor para o seu perfil</div></div></div>
+    <div class="comp-filter-row">
+      <button class="comp-f active" onclick="filtroCartao('todos',this)">Todos</button>
+      <button class="comp-f" onclick="filtroCartao('cashback',this)">Cashback</button>
+      <button class="comp-f" onclick="filtroCartao('milhas',this)">Milhas</button>
+      <button class="comp-f" onclick="filtroCartao('sem-anuidade',this)">Sem anuidade</button>
+      <button class="comp-f" onclick="filtroCartao('premium',this)">Premium</button>
+      <button class="comp-f" onclick="filtroCartao('digital',this)">Contas digitais</button>
+    </div>
+    <div class="comp-grid" id="cartao-grid">
+      <div class="comp-card top" data-tipo="cashback" data-badge="Melhor cashback">
+        <div class="cc-inst">Nubank</div>
+        <div class="cc-taxa" style="font-size:18px">Roxinho</div>
+        <div class="cc-tipo">Mastercard Gold · Sem anuidade<br>1% cashback em tudo</div>
+        <span class="pill p-g">0% anuidade · 1% cashback</span>
+      </div>
+      <div class="comp-card" data-tipo="cashback milhas">
+        <div class="cc-inst">Banco Inter</div>
+        <div class="cc-taxa" style="font-size:18px">Inter Black</div>
+        <div class="cc-tipo">Mastercard Black · Sem anuidade<br>0,5% cashback + milhas</div>
+        <span class="pill p-b">Sem anuidade · Milhas</span>
+      </div>
+      <div class="comp-card top" data-tipo="milhas" data-badge="Melhor para milhas">
+        <div class="cc-inst">Itaú</div>
+        <div class="cc-taxa" style="font-size:18px">Personnalité</div>
+        <div class="cc-tipo">Mastercard Black · 6 milhas / dólar<br>Sala VIP · Concierge</div>
+        <span class="pill p-gd">Premium · 6 milhas/USD</span>
+      </div>
+      <div class="comp-card" data-tipo="sem-anuidade digital">
+        <div class="cc-inst">C6 Bank</div>
+        <div class="cc-taxa" style="font-size:18px">C6 Carbon</div>
+        <div class="cc-tipo">Mastercard Black · Sem anuidade<br>Milhas + tag pedágio grátis</div>
+        <span class="pill p-n">Sem anuidade · Black</span>
+      </div>
+      <div class="comp-card" data-tipo="cashback sem-anuidade">
+        <div class="cc-inst">XP Investimentos</div>
+        <div class="cc-taxa" style="font-size:18px">XP Visa</div>
+        <div class="cc-tipo">Visa Infinite · Sem anuidade<br>1% cashback em XP</div>
+        <span class="pill p-g">1% cashback · Sem anuidade</span>
+      </div>
+      <div class="comp-card top" data-tipo="premium milhas" data-badge="Melhor premium">
+        <div class="cc-inst">Bradesco</div>
+        <div class="cc-taxa" style="font-size:18px">Elo Nanquim</div>
+        <div class="cc-tipo">Elo Nanquim · 3,5 milhas/R$<br>Sala VIP gratuita · Seguros</div>
+        <span class="pill p-gd">Ultra premium</span>
+      </div>
+      <div class="comp-card top" data-tipo="digital sem-anuidade" data-badge="Melhor conta digital">
+        <div class="cc-inst">Nubank</div>
+        <div class="cc-taxa" style="font-size:18px">NuConta</div>
+        <div class="cc-tipo">Conta digital · 100% CDI<br>Sem tarifas · Pix grátis</div>
+        <span class="pill p-g">100% CDI · Sem tarifas</span>
+      </div>
+      <div class="comp-card" data-tipo="digital sem-anuidade">
+        <div class="cc-inst">PicPay</div>
+        <div class="cc-taxa" style="font-size:18px">PicPay</div>
+        <div class="cc-tipo">Conta digital · 102% CDI<br>Cashback em compras</div>
+        <span class="pill p-b">102% CDI</span>
+      </div>
+    </div>
+
+    <div class="section" style="padding:2rem 0 0">
+      <div class="sec-hd"><div><div class="sec-title">Comparador de cashback</div><div class="sec-sub">Quanto você ganha por mês com cada cartão</div></div></div>
+      <div class="calc-wrap">
+        <div class="calc-body" style="padding:1.5rem">
+          <div class="form-row">
+            <div class="fg"><label>Gasto mensal total (R$)</label><input type="number" id="cb-gasto" value="5000" oninput="calcCashback()"></div>
+            <div class="fg"><label>% em supermercado</label><input type="number" id="cb-super" value="40" oninput="calcCashback()"></div>
+            <div class="fg"><label>% em viagem/restô</label><input type="number" id="cb-viagem" value="20" oninput="calcCashback()"></div>
+          </div>
+          <div style="overflow-x:auto">
+          <table class="comp-table">
+            <thead><tr><th>Cartão</th><th>Cashback %</th><th>Ganho/mês</th><th>Ganho/ano</th><th>Melhor para</th></tr></thead>
+            <tbody id="cb-tbody"></tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ EDUCAÇÃO ════════════════ -->
+<div id="page-educacao" class="page">
+  <div id="edu-list-view">
+  <div class="section">
+    <div class="sec-hd"><div><div class="sec-title">Educação financeira</div><div class="sec-sub">Do básico ao avançado — trilhas estruturadas e guias completos</div></div></div>
+
+    <div class="sec-hd" style="margin-bottom:1rem"><div><div class="sec-title" style="font-size:17px">Trilhas de aprendizado</div></div></div>
+    <div class="trilha-grid">
+      <div class="trilha-card trilha-i">
+        <div class="trilha-header"><div class="trilha-num">01</div><div class="trilha-info"><h4>Iniciante</h4><span>8 módulos · ~4 horas</span></div></div>
+        <div class="trilha-items">
+          <div class="trilha-item">O que é investir e por onde começar</div>
+          <div class="trilha-item">Reserva de emergência</div>
+          <div class="trilha-item">Renda fixa: Tesouro e CDB</div>
+          <div class="trilha-item">Poupança: por que evitar</div>
+          <div class="trilha-item">Orçamento 50-30-20</div>
+          <div class="trilha-item">Entendendo o CDI</div>
+        </div>
+      </div>
+      <div class="trilha-card trilha-m">
+        <div class="trilha-header"><div class="trilha-num">02</div><div class="trilha-info"><h4>Intermediário</h4><span>10 módulos · ~6 horas</span></div></div>
+        <div class="trilha-items">
+          <div class="trilha-item">LCI, LCA e equivalência de taxas</div>
+          <div class="trilha-item">Fundos imobiliários (FIIs)</div>
+          <div class="trilha-item">Renda variável: ações básico</div>
+          <div class="trilha-item">Previdência: PGBL vs VGBL</div>
+          <div class="trilha-item">Diversificação de carteira</div>
+          <div class="trilha-item">Declaração de IR</div>
+        </div>
+      </div>
+      <div class="trilha-card trilha-a">
+        <div class="trilha-header"><div class="trilha-num">03</div><div class="trilha-info"><h4>Avançado</h4><span>12 módulos · ~8 horas</span></div></div>
+        <div class="trilha-items">
+          <div class="trilha-item">Marcação a mercado</div>
+          <div class="trilha-item">Derivativos e opções</div>
+          <div class="trilha-item">Tributação avançada</div>
+          <div class="trilha-item">Internacionalização do patrimônio</div>
+          <div class="trilha-item">Estruturação holding familiar</div>
+          <div class="trilha-item">Independência financeira</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:2.5rem;margin-bottom:1rem"><div><div class="sec-title" style="font-size:17px">Artigos em destaque</div></div><span class="sec-link">Ver todos →</span></div>
+    <div class="art-layout">
+      <div>
+        <div class="cms-filters">
+          <button class="cms-f active" onclick="filtroEdu('todos',this)">Todos</button>
+          <button class="cms-f" onclick="filtroEdu('renda-fixa',this)">Renda fixa</button>
+          <button class="cms-f" onclick="filtroEdu('investimentos',this)">Investimentos</button>
+          <button class="cms-f" onclick="filtroEdu('orcamento',this)">Orçamento</button>
+          <button class="cms-f" onclick="filtroEdu('avancado',this)">Avançado</button>
+        </div>
+        <div class="art-list" id="art-list">
+          <div class="artigo" data-cat="renda-fixa" onclick="abrirEdu('cdb-lci')">
+            <div class="art-img" style="background:rgba(30,45,105,0.4)"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#1e2d69" stroke-width="2" opacity="0.8"/><circle cx="22" cy="22" r="11" stroke="#4b782d" stroke-width="1.5" opacity="0.5"/><line x1="22" y1="4" x2="22" y2="22" stroke="#87a54b" stroke-width="3" stroke-linecap="round"/><path d="M22 6 L25 12 L19 12 Z" fill="#87a54b"/></svg></div>
+            <div class="art-body">
+              <div class="art-cat">Renda fixa</div>
+              <h4>CDB, LCI ou LCA: qual rende mais para o seu perfil?</h4>
+              <p>Comparação completa com equivalência de taxas, IR e tabela de quando cada um compensa mais.</p>
+              <div class="art-foot"><span class="nivel n-i">Iniciante</span><span class="art-time">8 min</span></div>
+            </div>
+          </div>
+          <div class="artigo" data-cat="investimentos" onclick="abrirEdu('carteira')">
+            <div class="art-img" style="background:rgba(75,120,45,0.12)"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M8 38 L22 8 L36 38" stroke="#87a54b" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M13 28h18" stroke="#87a54b" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div class="art-body">
+              <div class="art-cat">Investimentos</div>
+              <h4>Carteira diversificada do zero: guia completo 2025</h4>
+              <p>Tesouro, CDB, FIIs e ações — como alocar considerando seu perfil e objetivos.</p>
+              <div class="art-foot"><span class="nivel n-i">Iniciante</span><span class="art-time">12 min</span></div>
+            </div>
+          </div>
+          <div class="artigo" data-cat="orcamento">
+            <div class="art-img" style="background:rgba(232,169,64,0.08)"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="10" y="14" width="24" height="20" rx="3" stroke="#e8a940" stroke-width="2"/><path d="M16 14V11a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v3" stroke="#e8a940" stroke-width="2"/><path d="M16 24h12M16 30h8" stroke="#e8a940" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="art-body">
+              <div class="art-cat">Orçamento</div>
+              <h4>Método 50-30-20: funciona na realidade brasileira?</h4>
+              <p>Análise crítica do método mais popular de controle de gastos, com adaptações para a realidade do Brasil.</p>
+              <div class="art-foot"><span class="nivel n-i">Iniciante</span><span class="art-time">7 min</span></div>
+            </div>
+          </div>
+          <div class="artigo" data-cat="avancado">
+            <div class="art-img" style="background:rgba(75,158,240,0.1)"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M10 34V18M22 34V8M34 34V22" stroke="#4b9ef0" stroke-width="3" stroke-linecap="round"/></svg></div>
+            <div class="art-body">
+              <div class="art-cat">Avançado</div>
+              <h4>Marcação a mercado: por que seu Tesouro pode estar negativo</h4>
+              <p>Entenda o mecanismo que faz os preços dos títulos variarem e quando isso é risco ou oportunidade.</p>
+              <div class="art-foot"><span class="nivel n-a">Avançado</span><span class="art-time">18 min</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sb-card">
+          <div class="sb-title">Mais lidos</div>
+          <div class="pop-item"><div class="pop-n">01</div><div><h6 onclick="abrirEdu('cdb-lci')">CDB vs LCI vs LCA: qual rende mais?</h6></div></div>
+          <div class="pop-item"><div class="pop-n">02</div><div><h6>Tesouro IPCA+: oportunidade histórica</h6></div></div>
+          <div class="pop-item"><div class="pop-n">03</div><div><h6 onclick="abrirEdu('carteira')">Carteira diversificada do zero</h6></div></div>
+          <div class="pop-item"><div class="pop-n">04</div><div><h6>Score Serasa: como melhorar rápido</h6></div></div>
+          <div class="pop-item"><div class="pop-n">05</div><div><h6>Independência financeira: calculadora</h6></div></div>
+        </div>
+        <div class="sb-card">
+          <div class="sb-title">Glossário rápido</div>
+          <div class="pop-item"><div><h6 style="color:var(--green-l);cursor:default">CDI</h6><p style="font-size:11.5px;color:var(--text3);margin-top:2px">Certificado de Depósito Interbancário — referência da renda fixa (≈ Selic - 0,1%)</p></div></div>
+          <div class="pop-item"><div><h6 style="color:var(--green-l);cursor:default">IPCA</h6><p style="font-size:11.5px;color:var(--text3);margin-top:2px">Índice de Preços ao Consumidor Amplo — inflação oficial do Brasil</p></div></div>
+          <div class="pop-item"><div><h6 style="color:var(--green-l);cursor:default">FGC</h6><p style="font-size:11.5px;color:var(--text3);margin-top:2px">Fundo Garantidor de Créditos — garante até R$ 250k por CPF por instituição</p></div></div>
+          <div class="pop-item" style="border:none"><div><h6 onclick="navTo('ferramentas',null);setTimeout(()=>navTo('educacao',null),50)" style="color:var(--accent-l);cursor:pointer">Ver glossário completo →</h6></div></div>
+        </div>
+        <div class="sb-card" style="background:rgba(75,120,45,0.1);border-color:rgba(75,120,45,0.2)">
+          <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:6px">Newsletter semanal</div>
+          <p style="font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:14px">Análises e taxas toda segunda-feira.</p>
+          <button onclick="navTo('newsletter',null)" style="width:100%;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Assinar grátis</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Article detail -->
+  <div class="art-detail" id="edu-cdb-lci">
+    <div class="section">
+      <div class="bread" onclick="voltarEdu()">← Voltar para educação</div>
+      <div class="art-layout">
+        <div>
+          <div class="art-hero-box">
+            <div class="art-hero-cat">Renda fixa · Guia completo</div>
+            <h2>CDB, LCI ou LCA: qual rende mais?</h2>
+            <div class="art-meta"><span>15 abr 2025</span><span>8 min</span><span class="nivel n-i">Iniciante</span></div>
+          </div>
+          <div class="art-content">
+            <p>CDB, LCI e LCA são os três produtos de renda fixa mais populares. Cada um tem características próprias de tributação, liquidez e rentabilidade.</p>
+            <h3>As diferenças fundamentais</h3>
+            <table class="art-table"><thead><tr><th>Produto</th><th>IR</th><th>FGC</th><th>Liquidez típica</th></tr></thead><tbody>
+              <tr><td>CDB</td><td>Sim (15–22,5%)</td><td>Sim</td><td>Diária ou no vencimento</td></tr>
+              <tr><td>LCI</td><td>Isento</td><td>Sim</td><td>90 dias mínimo</td></tr>
+              <tr><td>LCA</td><td>Isento</td><td>Sim</td><td>90 dias mínimo</td></tr>
+            </tbody></table>
+            <h3>Quando a LCI vale mais que o CDB?</h3>
+            <div class="art-hl">LCI 93% CDI = CDB ~112% CDI (IR 17,5%). Para prazos > 2 anos: LCI 90% CDI = CDB ~105,9% CDI.</div>
+            <p>Use nossa calculadora de equivalência de taxas na seção <strong>Renda fixa avançada</strong> para calcular qualquer cenário.</p>
+          </div>
+        </div>
+        <div><div class="sb-card"><div class="sb-title">Calcule agora</div><p style="font-size:12.5px;color:var(--text2);margin-bottom:12px;line-height:1.6">Simule CDB, LCI e compare os rendimentos líquidos.</p><button onclick="navTo('investimentos',null)" style="width:100%;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Ir para simuladores</button></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="art-detail" id="edu-carteira">
+    <div class="section">
+      <div class="bread" onclick="voltarEdu()">← Voltar para educação</div>
+      <div class="art-layout">
+        <div>
+          <div class="art-hero-box">
+            <div class="art-hero-cat">Investimentos · Guia completo</div>
+            <h2>Carteira diversificada do zero: guia 2025</h2>
+            <div class="art-meta"><span>10 abr 2025</span><span>12 min</span><span class="nivel n-i">Iniciante</span></div>
+          </div>
+          <div class="art-content">
+            <p>Montar uma carteira inteligente começa pela reserva de emergência e evolui conforme seu perfil de risco.</p>
+            <h3>Passo 1: Reserve de emergência</h3>
+            <p>6 meses de despesas em Tesouro Selic ou CDB com liquidez diária. Nunca invista esse dinheiro em produtos com carência.</p>
+            <div class="art-hl">Regra de ouro: nunca invista em renda variável dinheiro que pode precisar nos próximos 2 anos.</div>
+            <h3>Sugestão de carteira para iniciantes</h3>
+            <table class="art-table"><thead><tr><th>Ativo</th><th>Alocação</th><th>Objetivo</th></tr></thead><tbody>
+              <tr><td>Tesouro Selic</td><td>30%</td><td>Reserva de emergência</td></tr>
+              <tr><td>CDB/LCI/LCA</td><td>30%</td><td>Renda fixa médio prazo</td></tr>
+              <tr><td>Tesouro IPCA+</td><td>20%</td><td>Proteção inflacionária</td></tr>
+              <tr><td>FIIs</td><td>10%</td><td>Renda mensal passiva</td></tr>
+              <tr><td>ETFs/Ações</td><td>10%</td><td>Crescimento longo prazo</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+        <div><div class="sb-card"><div class="sb-title">Simule sua independência</div><button onclick="navTo('investimentos',null);setTimeout(()=>simTab('independencia',null),100)" style="width:100%;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px">Calculadora IF</button></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ FERRAMENTAS ════════════════ -->
+<div id="page-ferramentas" class="page">
+  <div class="section">
+    <div class="sec-hd"><div><div class="sec-title">Central de ferramentas</div><div class="sec-sub">Calculadoras, simuladores, comparadores, tabelas e planilhas gratuitas</div></div></div>
+
+    <div class="sec-hd" style="margin-bottom:1rem"><div><div class="sec-title" style="font-size:16px">Calculadoras</div></div></div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('cdb',null),100)"><div class="tool-type">Calculadora</div><div class="tool-name">CDB</div><div class="tool-desc">Rendimento bruto e líquido com CDI real</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('lci',null),100)"><div class="tool-type">Calculadora</div><div class="tool-name">LCI / LCA</div><div class="tool-desc">Isento de IR — equivalência com CDB</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('compostos',null),100)"><div class="tool-type">Calculadora</div><div class="tool-name">Juros compostos</div><div class="tool-desc">Patrimônio futuro com aportes mensais</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('avancado',null);setTimeout(()=>avTab('taxa-real',null),100)"><div class="tool-type">Calculadora</div><div class="tool-name">Taxa real</div><div class="tool-desc">Rendimento descontada a inflação</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('avancado',null);setTimeout(()=>avTab('ir-iof',null),100)"><div class="tool-type">Calculadora</div><div class="tool-name">IR e IOF</div><div class="tool-desc">Imposto regressivo por prazo</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('avancado',null);setTimeout(()=>avTab('vs-inflacao',null),100)"><div class="tool-type">Calculadora</div><div class="tool-name">Vs inflação</div><div class="tool-desc">Quanto seu dinheiro cresce acima do IPCA</div><div class="tool-arrow">→</div></div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:2rem;margin-bottom:1rem"><div><div class="sec-title" style="font-size:16px">Simuladores</div></div></div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('t-selic',null),100)"><div class="tool-type">Simulador</div><div class="tool-name">Tesouro Selic</div><div class="tool-desc">Com taxa de custódia e IR real</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('t-prefixado',null),100)"><div class="tool-type">Simulador</div><div class="tool-name">Tesouro Prefixado</div><div class="tool-desc">Análise vs Selic esperada</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('t-ipca',null),100)"><div class="tool-type">Simulador</div><div class="tool-name">Tesouro IPCA+</div><div class="tool-desc">Ganho real acima da inflação</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('independencia',null),100)"><div class="tool-type">Simulador</div><div class="tool-name">Independência financeira</div><div class="tool-desc">Em quantos anos você atinge a IF?</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('patrimonio',null),100)"><div class="tool-type">Simulador</div><div class="tool-name">Patrimônio alvo</div><div class="tool-desc">Quanto tempo para atingir seu objetivo</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('avancado',null);setTimeout(()=>avTab('marcacao',null),100)"><div class="tool-type">Simulador</div><div class="tool-name">Marcação a mercado</div><div class="tool-desc">Valor de mercado de prefixados/IPCA+</div><div class="tool-arrow">→</div></div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:2rem;margin-bottom:1rem"><div><div class="sec-title" style="font-size:16px">Comparadores</div></div></div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="navTo('investimentos',null);setTimeout(()=>simTab('comparar',null),100)"><div class="tool-type">Comparador</div><div class="tool-name">Qual rende mais?</div><div class="tool-desc">CDB vs LCI vs Tesouro vs Poupança</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('avancado',null);setTimeout(()=>avTab('equiv',null),100)"><div class="tool-type">Comparador</div><div class="tool-name">Equivalência de taxas</div><div class="tool-desc">Converta LCI em % CDI equivalente</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('avancado',null);setTimeout(()=>avTab('bruto-liq',null),100)"><div class="tool-type">Comparador</div><div class="tool-name">Bruto vs líquido</div><div class="tool-desc">Impacto real do IR no rendimento</div><div class="tool-arrow">→</div></div>
+      <div class="tool-card" onclick="navTo('cartoes',null)"><div class="tool-type">Comparador</div><div class="tool-name">Cartões de crédito</div><div class="tool-desc">Cashback, milhas e anuidade</div><div class="tool-arrow">→</div></div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:2rem;margin-bottom:1rem"><div><div class="sec-title" style="font-size:16px">Tabelas de referência</div></div></div>
+    <div class="grid-2">
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:#fff;margin-bottom:10px">Tabela regressiva de IR</div>
+        <table class="macro-table">
+          <thead><tr><th>Prazo</th><th>Alíquota IR</th></tr></thead>
+          <tbody>
+            <tr><td>Até 180 dias</td><td class="macro-dn">22,5%</td></tr>
+            <tr><td>181 a 360 dias</td><td class="macro-dn">20,0%</td></tr>
+            <tr><td>361 a 720 dias</td><td>17,5%</td></tr>
+            <tr><td>Acima de 720 dias</td><td class="macro-up">15,0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:#fff;margin-bottom:10px">Tabela de IOF regressivo</div>
+        <table class="macro-table">
+          <thead><tr><th>Dias</th><th>IOF %</th><th>Dias</th><th>IOF %</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="macro-dn">96%</td><td>16</td><td>46%</td></tr>
+            <tr><td>2</td><td class="macro-dn">93%</td><td>20</td><td>30%</td></tr>
+            <tr><td>5</td><td class="macro-dn">80%</td><td>25</td><td>13%</td></tr>
+            <tr><td>10</td><td>63%</td><td>30+</td><td class="macro-up">0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:2rem;margin-bottom:1rem"><div><div class="sec-title" style="font-size:16px">Glossário financeiro</div></div></div>
+    <div class="gloss-grid">
+      <div class="gloss-item"><div class="gloss-term">CDI</div><div class="gloss-def">Certificado de Depósito Interbancário — taxa de referência dos investimentos em renda fixa. Segue a Selic de perto (~Selic - 0,1%).</div></div>
+      <div class="gloss-item"><div class="gloss-term">Selic</div><div class="gloss-def">Taxa básica de juros definida pelo Copom/BCB. Influencia todos os juros da economia e o rendimento dos títulos públicos.</div></div>
+      <div class="gloss-item"><div class="gloss-term">IPCA</div><div class="gloss-def">Índice de Preços ao Consumidor Amplo — inflação oficial do Brasil, medida pelo IBGE. Meta atual: 3% ± 1,5pp.</div></div>
+      <div class="gloss-item"><div class="gloss-term">FGC</div><div class="gloss-def">Fundo Garantidor de Créditos — garante até R$ 250.000 por CPF por instituição em CDB, LCI, LCA e poupança.</div></div>
+      <div class="gloss-item"><div class="gloss-term">Marcação a mercado</div><div class="gloss-def">Método de calcular o valor atual de um título baseado nas taxas vigentes. Prefixados e IPCA+ podem oscilar antes do vencimento.</div></div>
+      <div class="gloss-item"><div class="gloss-term">Taxa real</div><div class="gloss-def">Rendimento descontada a inflação. Fórmula de Fisher: taxa real = (1 + nominal) / (1 + inflação) - 1.</div></div>
+      <div class="gloss-item"><div class="gloss-term">LCI / LCA</div><div class="gloss-def">Letra de Crédito Imobiliário/do Agronegócio — isentas de IR para PF. Carência mínima de 90 dias.</div></div>
+      <div class="gloss-item"><div class="gloss-term">Spread</div><div class="gloss-def">Diferença entre a taxa que o banco cobra e a taxa que paga. Quanto maior o spread, mais o banco lucra e menos você recebe.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ NEWSLETTER ════════════════ -->
+<div id="page-newsletter" class="page">
+  <div style="max-width:960px;margin:0 auto;padding:2.5rem 2rem">
+    <div class="nl-hero">
+      <div class="eyebrow">Newsletter gratuita · Toda segunda-feira</div>
+      <h2>Seu radar financeiro<br>direto no e-mail</h2>
+      <p>Taxas atualizadas, análises de mercado, oportunidades e educação financeira — em 5 minutos de leitura.</p>
+      <div class="nl-form">
+        <input class="nl-input" type="email" id="nl-email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')assinar()">
+        <button class="nl-btn" onclick="assinar()">Assinar grátis</button>
+      </div>
+      <div class="nl-ok" id="nl-ok">Perfeito! Você receberá a próxima edição na segunda-feira.</div>
+      <div class="nl-priv">Sem spam. Cancele quando quiser. +12.000 leitores.</div>
+    </div>
+    <div class="nl-benefits">
+      <div class="nl-ben"><div class="nl-ben-icon ci-navy"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16L10 4l6 12" stroke="#8899dd" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg></div><h4>Taxas da semana</h4><p>Melhores CDB, LCI e LCA com rendimento líquido calculado.</p></div>
+      <div class="nl-ben"><div class="nl-ben-icon ci-green"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#87a54b" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="#87a54b" stroke-width="1.5" stroke-linecap="round"/></svg></div><h4>Análise da semana</h4><p>Um tema financeiro aprofundado: Selic, câmbio ou mercado.</p></div>
+      <div class="nl-ben"><div class="nl-ben-icon ci-gold"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 15l3-3 3 3 5-6" stroke="#e8a940" stroke-width="1.5" stroke-linecap="round"/></svg></div><h4>Dica prática</h4><p>Uma ação concreta que você pode tomar esta semana.</p></div>
+      <div class="nl-ben"><div class="nl-ben-icon ci-blue"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="10" rx="2" stroke="#4b9ef0" stroke-width="1.5"/><path d="M3 8l7 4.5L17 8" stroke="#4b9ef0" stroke-width="1.5" stroke-linecap="round"/></svg></div><h4>5 minutos</h4><p>Formatada para ler no café da manhã de segunda-feira.</p></div>
+    </div>
+    <div class="editions-wrap">
+      <div class="ed-header"><h3>Edições recentes</h3><span style="font-size:12px;color:var(--text3)">Prévia gratuita</span></div>
+      <div class="ed-item"><div class="ed-date">14 abr 2025</div><div class="ed-body"><h5>Selic parada: o que fazer com sua carteira agora</h5><p>Copom mantém juros, Tesouro IPCA+ em máxima e estratégia para cada perfil.</p><div class="ed-tags"><span class="pill p-n" style="margin:0">Selic</span><span class="pill p-g" style="margin:0">Tesouro</span></div></div></div>
+      <div class="ed-item"><div class="ed-date">7 abr 2025</div><div class="ed-body"><h5>LCI ou CDB? O guia definitivo para comparar rendimento líquido</h5><p>Entenda de vez quando a LCI bate o CDB e as melhores taxas desta semana.</p><div class="ed-tags"><span class="pill p-g" style="margin:0">LCI</span><span class="pill p-n" style="margin:0">CDB</span></div></div></div>
+      <div class="ed-item"><div class="ed-date">31 mar 2025</div><div class="ed-body"><h5>Inflação acima do esperado: como proteger seu patrimônio</h5><p>IPCA surpreende e estratégias para não perder poder de compra nos próximos 12 meses.</p><div class="ed-tags"><span class="pill p-gd" style="margin:0">IPCA</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-inner">
+    <div class="ft-top">
+      <div class="ft-brand">
+        <div class="ft-logo">
+          <svg width="22" height="22" viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="17" stroke="#1e2d69" stroke-width="1.5" fill="none"/><circle cx="19" cy="19" r="11" stroke="#1e2d69" stroke-width="1" fill="none" opacity="0.5"/><path d="M19 22 L24 10 L28 14" stroke="#4b782d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="19" cy="22" r="2" fill="#1e2d69"/></svg>
+          Radar Financeiro
+        </div>
+        <p>Portal completo de educação financeira, simuladores com dados ao vivo do Banco Central e comparadores de produtos financeiros.</p>
+        <div style="margin-top:14px;font-size:11.5px;color:var(--success);display:flex;align-items:center;gap:6px"><span class="live-dot"></span> Dados em tempo real via api.bcb.gov.br</div>
+      </div>
+      <div class="ft-col">
+        <h5>Simuladores</h5>
+        <a onclick="navTo('investimentos',null);setTimeout(()=>simTab('cdb',null),100)">CDB</a>
+        <a onclick="navTo('investimentos',null);setTimeout(()=>simTab('lci',null),100)">LCI / LCA</a>
+        <a onclick="navTo('investimentos',null);setTimeout(()=>simTab('t-selic',null),100)">Tesouro Selic</a>
+        <a onclick="navTo('investimentos',null);setTimeout(()=>simTab('comparar',null),100)">Qual rende mais?</a>
+        <a onclick="navTo('investimentos',null);setTimeout(()=>simTab('independencia',null),100)">Independência financeira</a>
+      </div>
+      <div class="ft-col">
+        <h5>Avançado</h5>
+        <a onclick="navTo('avancado',null);setTimeout(()=>avTab('equiv',null),100)">Equivalência de taxas</a>
+        <a onclick="navTo('avancado',null);setTimeout(()=>avTab('ir-iof',null),100)">IR e IOF</a>
+        <a onclick="navTo('avancado',null);setTimeout(()=>avTab('marcacao',null),100)">Marcação a mercado</a>
+        <a onclick="navTo('avancado',null);setTimeout(()=>avTab('taxa-real',null),100)">Taxa real</a>
+      </div>
+      <div class="ft-col">
+        <h5>Portal</h5>
+        <a onclick="navTo('educacao',null)">Educação financeira</a>
+        <a onclick="navTo('cartoes',null)">Cartões e crédito</a>
+        <a onclick="navTo('ferramentas',null)">Ferramentas</a>
+        <a onclick="navTo('newsletter',null)">Newsletter</a>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <span>© 2025 Radar Financeiro. Todos os direitos reservados.</span>
+      <span>Conteúdo educacional — não é recomendação de investimento</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── GLOBALS (declarados primeiro) ──
+let API = { selic:14.75, cdi:14.65, ipca:5.48, poupanca:7.80, dolar:5.84, ibov:198000 };
+const f2=(n)=>n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ── NAVIGATION ──
+function navTo(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page)?.classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else {
+    const map={home:0,investimentos:1,avancado:2,cartoes:3,educacao:4,ferramentas:5,newsletter:6};
+    const i=map[page]; if(i!==undefined) document.querySelectorAll('.nav-links a')[i]?.classList.add('active');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='investimentos') fetchAndCalc();
+}
+
+// ── TABS ──
+function invSection(id, el){
+  document.querySelectorAll('.inv-section-tabs .ist').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.inv-section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('inv-'+id)?.classList.add('active');
+  if(id==='acoes'){ calcDY();calcPJ();calcDN();calcCarteira();calcRFvsRV(); }
+  if(id==='fiis'){ calcFIIRenda();calcFIICap();calcFIIvsImovel();calcFIIvsCDB();calcPVP(); }
+}
+function simTab(id, el){
+  document.querySelectorAll('#inv-rf .calc-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#inv-rf .calc-panel').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('#inv-rf .calc-tab').forEach(t=>{if(t.getAttribute('onclick')?.includes("'"+id+"'")) t.classList.add('active');});
+  document.getElementById('sim-'+id)?.classList.add('active');
+  if(id==='comparar') calcCompar();
+  if(id==='compostos') calcJC();
+  if(id==='independencia') calcIF();
+  if(id==='patrimonio') calcPA();
+  if(id==='lci') calcLCI();
+}
+function acoesTab(id, el){
+  document.querySelectorAll('#inv-acoes .calc-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#inv-acoes .calc-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ac-'+id)?.classList.add('active');
+}
+function fiisTab(id, el){
+  document.querySelectorAll('#inv-fiis .calc-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#inv-fiis .calc-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('fii-'+id)?.classList.add('active');
+}
+function avTab(id, el){
+  document.querySelectorAll('#page-avancado .calc-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#page-avancado .calc-panel').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('#page-avancado .calc-tab').forEach(t=>{if(t.getAttribute('onclick')?.includes(id)) t.classList.add('active');});
+  document.getElementById('av-'+id)?.classList.add('active');
+}
+
+// ── FILTROS ──
+function filtroCartao(tipo,el){
+  document.querySelectorAll('.comp-f').forEach(f=>f.classList.remove('active')); el.classList.add('active');
+  document.querySelectorAll('#cartao-grid .comp-card').forEach(c=>c.style.display=(tipo==='todos'||c.dataset.tipo?.includes(tipo))?'':'none');
+}
+function filtroEdu(cat,el){
+  document.querySelectorAll('.cms-f').forEach(f=>f.classList.remove('active')); if(el) el.classList.add('active');
+  document.querySelectorAll('#art-list .artigo').forEach(a=>a.style.display=(cat==='todos'||a.dataset.cat?.includes(cat))?'':'none');
+}
+function abrirEdu(id){
+  document.getElementById('edu-list-view').style.display='none';
+  document.querySelectorAll('.art-detail').forEach(d=>d.classList.remove('show'));
+  document.getElementById('edu-'+id)?.classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function voltarEdu(){
+  document.getElementById('edu-list-view').style.display='';
+  document.querySelectorAll('.art-detail').forEach(d=>d.classList.remove('show'));
+}
+
+// ── UTILS ──
+const fI=(n)=>Math.round(n).toLocaleString('pt-BR');
+const fK=(n)=>n>=1e6?'R$ '+(n/1e6).toFixed(2).replace('.',',')+'M':n>=1000?'R$ '+Math.round(n/1000)+'k':'R$ '+fI(n);
+const irAliq=(m)=>m<=6?0.225:m<=12?0.20:m<=24?0.175:0.15;
+const iofAliq=(d)=>d>=30?0:Math.max(0,(96-(d-1)*3.33))/100;
+function compoundMonthly(v,ap,taxaA,meses){ const tm=Math.pow(1+taxaA/100,1/12)-1; let s=v; for(let i=0;i<meses;i++) s=s*(1+tm)+ap; return s; }
+
+// ── API BCB ──
+// Séries BCB corretas:
+// 432  = Selic meta (% a.a.)
+// 4389 = CDI acumulado no mês (% a.m.) → anualizar
+// 13522= IPCA acumulado 12 meses (% acumulado)
+// 195  = Poupança rendimento mensal (% a.m.) → anualizar
+
+async function tryFetch(url, timeout=7000){
+  const ctrl=new AbortController();
+  const tid=setTimeout(()=>ctrl.abort(),timeout);
+  try{
+    const r=await fetch(url,{signal:ctrl.signal});
+    clearTimeout(tid);
+    if(!r.ok)return null;
+    return await r.json();
+  }catch(e){ clearTimeout(tid); return null; }
+}
+
+async function fetchBCB(serie){
+  const url=`https://api.bcb.gov.br/dados/serie/bcdata.sgs.${serie}/dados/ultimos/3?formato=json`;
+  // Direto
+  let d=await tryFetch(url);
+  if(d&&d.length){ const v=d[d.length-1].valor.replace(',','.'); return parseFloat(v); }
+  // Proxy allorigins
+  const p=await tryFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+  if(p&&p.contents){
+    try{ const j=JSON.parse(p.contents); if(j&&j.length){ const v=j[j.length-1].valor.replace(',','.'); return parseFloat(v); } }catch{}
+  }
+  // Proxy corsproxy
+  const c=await tryFetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+  if(c&&c.length){ const v=c[c.length-1].valor.replace(',','.'); return parseFloat(v); }
+  return null;
+}
+
+async function fetchDolar(){
+  const d=await tryFetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+  if(d&&d.USDBRL) return parseFloat(d.USDBRL.bid);
+  return null;
+}
+
+function setEl(id, txt){
+  const el=document.getElementById(id);
+  if(el){ el.textContent=txt; el.closest?.('.hs')?.classList.remove('loading'); }
+}
+
+function applyToUI(){
+  // Hero cards
+  setEl('hs-selic', API.selic.toFixed(2)+'%');
+  setEl('hs-cdi',   API.cdi.toFixed(2)+'%');
+  setEl('hs-ipca',  API.ipca.toFixed(2)+'%');
+  setEl('hs-poup',  API.poupanca.toFixed(2)+'%');
+  // Remover loading
+  document.querySelectorAll('.hs.loading').forEach(el=>el.classList.remove('loading'));
+  // Ticker
+  setEl('tk-selic', API.selic.toFixed(2)+'%');
+  setEl('tk-cdi',   API.cdi.toFixed(2)+'%');
+  setEl('tk-ipca',  API.ipca.toFixed(2)+'%');
+  setEl('tk-dolar', 'R$ '+API.dolar.toFixed(2));
+  setEl('tk-ibov',  Math.round(API.ibov).toLocaleString('pt-BR'));
+  // Inputs das calculadoras
+  const ts=document.getElementById('ts-selic'); if(ts) ts.value=API.selic.toFixed(2);
+  ['tr-ipca','vi-ipca','ti-ipca'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=API.ipca.toFixed(2);});
+  // Label CDI e Selic
+  const lbl=document.getElementById('sim-cdi-label'); if(lbl) lbl.textContent=API.cdi.toFixed(2)+'%';
+  const lbl2=document.getElementById('sim-selic-label'); if(lbl2) lbl2.textContent=API.selic.toFixed(2)+'%';
+  const ibovEl=document.getElementById('acoes-ibov'); if(ibovEl) ibovEl.textContent=Math.round(API.ibov).toLocaleString('pt-BR')+' pts';
+}
+
+async function fetchAndCalc(){
+  // Busca em paralelo — sem bloquear a UI
+  const [selic, cdiMes, ipca12m, poupMes, dolar] = await Promise.all([
+    fetchBCB(432),   // Selic % a.a.
+    fetchBCB(4389),  // CDI % a.m. → anualizar
+    fetchBCB(13522), // IPCA 12m acumulado
+    fetchBCB(195),   // Poupança % a.m. → anualizar
+    fetchDolar(),
+  ]);
+
+  let atualizado=false;
+
+  if(selic!=null && selic>0){
+    API.selic=selic;
+    // CDI é sempre ~Selic - 0,10% a.a.
+    API.cdi=selic-0.10;
+    atualizado=true;
+  }
+  // CDI série 4389 como confirmação secundária (não sobrescreve a regra Selic-0.10)
+  if(cdiMes!=null && cdiMes>0){
+    const cdiCalc=(Math.pow(1+cdiMes/100,12)-1)*100;
+    // Usa apenas se plausível (dentro de 0.5% da Selic)
+    if(selic!=null && Math.abs(cdiCalc-(selic-0.10))<0.5) API.cdi=cdiCalc;
+    atualizado=true;
+  }
+  if(ipca12m!=null && ipca12m>0){ API.ipca=ipca12m; atualizado=true; }
+  if(poupMes!=null && poupMes>0){
+    // Poupança: Selic > 8,5% → 0,5%/mês + TR ≈ 6,17% a.a. (regra fixa)
+    // Selic ≤ 8,5% → 70% da Selic
+    const poupAno = API.selic > 8.5
+      ? (Math.pow(1+0.005,12)-1)*100   // 6,17% a.a.
+      : API.selic * 0.70;
+    API.poupanca=poupAno;
+    atualizado=true;
+  } else if(selic!=null){
+    // Derivar poupança da Selic mesmo sem BCB
+    API.poupanca = API.selic > 8.5 ? (Math.pow(1+0.005,12)-1)*100 : API.selic*0.70;
+  }
+  if(dolar!=null && dolar>1){ API.dolar=dolar; atualizado=true; }
+
+  applyToUI();
+
+  // Status badge
+  const badge=document.querySelector('.live-badge');
+  if(badge){
+    if(atualizado) badge.innerHTML='<span class="live-dot"></span> Atualizado agora';
+    else badge.innerHTML='<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:4px"></span> Referência BCB';
+  }
+
+  // Recalcula tudo
+  calcCDB();calcLCI();calcTS();calcTP();calcTI();calcCompar();calcJC();calcIF();calcPA();
+  calcBL();calcIIOF();calcEquiv();calcTReal();calcVI();calcMM();calcCashback();
+  const lbl2=document.getElementById('sim-selic-label'); if(lbl2) lbl2.textContent=API.selic.toFixed(2)+'%';
+  const ibovEl=document.getElementById('acoes-ibov'); if(ibovEl) ibovEl.textContent=Math.round(API.ibov).toLocaleString('pt-BR')+' pts';
+}
+
+// ── AÇÕES CALCULATORS ──
+function calcDY(){
+  const v=+(document.getElementById('ac-val')?.value||50000);
+  const dy=+(document.getElementById('ac-dy')?.value||6.5)/100;
+  const cresc=+(document.getElementById('ac-crescimento')?.value||8)/100;
+  const anos=+(document.getElementById('ac-anos')?.value||10);
+  const mesal=v*dy/12;
+  const dyFut=dy*Math.pow(1+cresc,anos);
+  const mesalFut=v*dyFut/12;
+  let total=0; for(let i=0;i<anos*12;i++) total+=v*(dy/12)*Math.pow(1+cresc/12,i);
+  const yoc=dyFut*100;
+  const anof=new Date().getFullYear()+anos;
+  document.getElementById('dy-rv').innerHTML=`R$ ${fI(mesal)}<span>/mês hoje</span>`;
+  document.getElementById('dy-det').textContent=`DY ${(dy*100).toFixed(1)}% a.a. · crescimento ${(cresc*100).toFixed(0)}% a.a.`;
+  document.getElementById('dy-mes').textContent='R$ '+fI(mesal)+'/mês';
+  document.getElementById('dy-ano-fut').textContent=anof;
+  document.getElementById('dy-mes-fut').textContent='R$ '+fI(mesalFut)+'/mês';
+  document.getElementById('dy-total').textContent='R$ '+fI(total);
+  document.getElementById('dy-yoc').textContent=yoc.toFixed(1)+'% a.a.';
+}
+function calcPJ(){
+  const lpa=+(document.getElementById('pj-lpa')?.value||5);
+  const vpa=+(document.getElementById('pj-vpa')?.value||25);
+  const pl=+(document.getElementById('pj-pl')?.value||12);
+  const cresc=+(document.getElementById('pj-cresc')?.value||10);
+  const graham=Math.sqrt(22.5*lpa*vpa);
+  const byPL=lpa*pl;
+  const dcf=lpa*(1+cresc/100)/(0.10-cresc/100/5); // simplified
+  const media=(graham+byPL+Math.max(0,dcf))/3;
+  document.getElementById('pj-rv').innerHTML=`R$ ${f2(media)} <span>preço justo médio</span>`;
+  document.getElementById('pj-det').textContent=`Média Graham + P/L + DCF simplificado`;
+  document.getElementById('pj-graham').textContent='R$ '+f2(graham);
+  document.getElementById('pj-pl-val').textContent='R$ '+f2(byPL);
+  document.getElementById('pj-dcf').textContent='R$ '+f2(Math.max(0,dcf));
+  document.getElementById('pj-media').textContent='R$ '+f2(media);
+}
+function calcDN(){
+  const renda=+(document.getElementById('dn-renda')?.value||5000);
+  const capital=+(document.getElementById('dn-capital')?.value||500000);
+  const dyNec=(renda*12/capital)*100;
+  document.getElementById('dn-rv').innerHTML=`${dyNec.toFixed(2)}% a.a. <span>necessário</span>`;
+  document.getElementById('dn-det').textContent=`Para gerar R$ ${fI(renda)}/mês com R$ ${fI(capital)} investidos`;
+  document.getElementById('dn-dy-ano').textContent=dyNec.toFixed(2)+'% a.a.';
+  document.getElementById('dn-renda-r').textContent='R$ '+fI(renda)+'/mês';
+  document.getElementById('dn-cap6').textContent='R$ '+fI(renda*12/0.06);
+  document.getElementById('dn-cap8').textContent='R$ '+fI(renda*12/0.08);
+}
+function calcCarteira(){
+  const cap=+(document.getElementById('ca-cap')?.value||100000);
+  const pDiv=+(document.getElementById('ca-div')?.value||40)/100;
+  const pCresc=+(document.getElementById('ca-cresc')?.value||40)/100;
+  const pSmall=+(document.getElementById('ca-small')?.value||20)/100;
+  const tot=pDiv+pCresc+pSmall;
+  document.getElementById('ca-rv').innerHTML=`R$ ${fI(cap)} <span>distribuídos</span>`;
+  document.getElementById('ca-det').textContent=`${(pDiv*100).toFixed(0)}% dividendos · ${(pCresc*100).toFixed(0)}% crescimento · ${(pSmall*100).toFixed(0)}% small caps`;
+  document.getElementById('ca-div-r').textContent='R$ '+fI(cap*pDiv/tot);
+  document.getElementById('ca-cresc-r').textContent='R$ '+fI(cap*pCresc/tot);
+  document.getElementById('ca-small-r').textContent='R$ '+fI(cap*pSmall/tot);
+  const dyMedio=(pDiv*6+pCresc*2+pSmall*1.5)/tot;
+  document.getElementById('ca-dy-medio').textContent=dyMedio.toFixed(1)+'% a.a. estimado';
+}
+function calcRFvsRV(){
+  const v=+(document.getElementById('rv-val')?.value||50000);
+  const retAcoes=+(document.getElementById('rv-acoes')?.value||14)/100;
+  const rfPct=+(document.getElementById('rv-rf-pct')?.value||110);
+  const anos=+(document.getElementById('rv-anos')?.value||10);
+  const anof=new Date().getFullYear()+anos;
+  const rfTaxa=API.cdi*rfPct/100/100;
+  const tm=Math.pow(1+rfTaxa,1/12)-1;
+  const rfFinal=v*Math.pow(1+tm,anos*12);
+  const rfBruto=rfFinal-v; const aliq=0.15;
+  const rfLiq=rfBruto*(1-aliq);
+  const acoesFinal=v*Math.pow(1+retAcoes,anos);
+  const diff=acoesFinal-(v+rfLiq);
+  const premio=retAcoes*100-(rfTaxa*(1-aliq))*100;
+  document.getElementById('rv-ano-fut').textContent=anof;
+  document.getElementById('rv-rv').innerHTML=`${diff>=0?'Ações vence':'RF vence'} <span>por R$ ${fI(Math.abs(diff))}</span>`;
+  document.getElementById('rv-det').textContent=`Horizonte de ${anos} anos · CDI ${API.cdi.toFixed(2)}% · RF ${rfPct}% CDI`;
+  document.getElementById('rv-rf-r').textContent='R$ '+fI(v+rfLiq);
+  document.getElementById('rv-ac-r').textContent='R$ '+fI(acoesFinal);
+  const diffEl=document.getElementById('rv-diff'); diffEl.textContent=(diff>=0?'+ R$ ':'- R$ ')+fI(Math.abs(diff)); diffEl.className='mv '+(diff>=0?'green':'red');
+  document.getElementById('rv-premio').textContent=(premio>=0?'+':'')+premio.toFixed(1)+'% a.a.';
+}
+
+// ── FIIs CALCULATORS ──
+function calcFIIRenda(){
+  const v=+(document.getElementById('fii-val')?.value||100000);
+  const dyMes=+(document.getElementById('fii-dy-mes')?.value||0.85)/100;
+  const ap=+(document.getElementById('fii-ap')?.value||1000);
+  const anos=+(document.getElementById('fii-anos')?.value||10);
+  const anof=new Date().getFullYear()+anos;
+  const rendaHoje=v*dyMes;
+  let pat=v; for(let i=0;i<anos*12;i++){pat=pat*(1+dyMes)+ap;}
+  const rendaFut=pat*dyMes;
+  const dyAno=(Math.pow(1+dyMes,12)-1)*100;
+  document.getElementById('fii-rv').innerHTML=`R$ ${fI(rendaHoje)}<span>/mês (hoje)</span>`;
+  document.getElementById('fii-det').textContent=`DY ${(dyMes*100).toFixed(2)}%/mês = ${dyAno.toFixed(2)}% a.a. · Isento IR`;
+  document.getElementById('fii-renda-hoje').textContent='R$ '+fI(rendaHoje)+'/mês';
+  document.getElementById('fii-ano-fut').textContent=anof;
+  document.getElementById('fii-renda-fut').textContent='R$ '+fI(rendaFut)+'/mês';
+  document.getElementById('fii-dy-ano').textContent=dyAno.toFixed(2)+'% a.a.';
+}
+function calcFIICap(){
+  const renda=+(document.getElementById('fc-renda')?.value||5000);
+  const dy=+(document.getElementById('fc-dy')?.value||0.85)/100;
+  const cap=renda/dy;
+  const dyAno=(Math.pow(1+dy,12)-1)*100;
+  document.getElementById('fc-rv').innerHTML=`R$ ${fI(cap)} <span>necessário</span>`;
+  document.getElementById('fc-det').textContent=`Para gerar R$ ${fI(renda)}/mês com DY ${(dy*100).toFixed(2)}%/mês`;
+  document.getElementById('fc-cap').textContent='R$ '+fI(cap);
+  document.getElementById('fc-dy-ano').textContent=dyAno.toFixed(2)+'% a.a.';
+  document.getElementById('fc-cap1').textContent='R$ '+fI(renda/0.01);
+  document.getElementById('fc-cap07').textContent='R$ '+fI(renda/0.007);
+}
+function calcFIIvsImovel(){
+  const v=+(document.getElementById('fi-val')?.value||500000);
+  const aluguel=+(document.getElementById('fi-aluguel')?.value||2500);
+  const dy=+(document.getElementById('fi-dy')?.value||0.85)/100;
+  const valorizacao=+(document.getElementById('fi-valorizacao')?.value||5)/100;
+  const yieldIm=(aluguel*12/v)*100;
+  const yieldFii=(Math.pow(1+dy,12)-1)*100;
+  const rendaImLiq=aluguel*(1-0.275); // IR 27.5% na faixa
+  const rendaFii=v*dy;
+  const vence=yieldFii>yieldIm?'FII':'Imóvel físico';
+  document.getElementById('fi-rv').innerHTML=`${vence} tem maior <span>yield líquido</span>`;
+  document.getElementById('fi-det').textContent=`FII ${yieldFii.toFixed(2)}% a.a. vs Imóvel ${yieldIm.toFixed(2)}% a.a. (bruto)`;
+  document.getElementById('fi-yield-im').textContent=yieldIm.toFixed(2)+'% a.a.';
+  document.getElementById('fi-yield-fii').textContent=yieldFii.toFixed(2)+'% a.a.';
+  document.getElementById('fi-renda-im').textContent='R$ '+fI(rendaImLiq)+'/mês';
+  document.getElementById('fi-renda-fii').textContent='R$ '+fI(rendaFii)+'/mês';
+}
+function calcFIIvsCDB(){
+  const v=+(document.getElementById('fvc-val')?.value||100000);
+  const dy=+(document.getElementById('fvc-dy')?.value||0.85)/100;
+  const cdbPct=+(document.getElementById('fvc-cdb')?.value||110);
+  const m=+(document.getElementById('fvc-prazo')?.value||12);
+  const rendaFii=v*dy*m;
+  const cdiTaxa=API.cdi*cdbPct/100/100;
+  const tm=Math.pow(1+cdiTaxa,1/12)-1;
+  const cdbFinal=v*Math.pow(1+tm,m)-v;
+  const aliq=irAliq(m); const cdbLiq=cdbFinal*(1-aliq);
+  const diff=rendaFii-cdbLiq;
+  document.getElementById('fvc-rv').innerHTML=`${diff>=0?'FII':'CDB'} rende mais <span>R$ ${fI(Math.abs(diff))}</span>`;
+  document.getElementById('fvc-det').textContent=`FII ${(dy*100).toFixed(2)}%/mês vs CDB ${cdbPct}% CDI · ${m} meses`;
+  document.getElementById('fvc-fii-r').textContent='R$ '+fI(rendaFii);
+  document.getElementById('fvc-cdb-r').textContent='R$ '+fI(cdbLiq);
+  const venceEl=document.getElementById('fvc-vence'); venceEl.textContent=diff>=0?'SIM':'NÃO'; venceEl.className='mv '+(diff>=0?'green':'red');
+  const diffEl=document.getElementById('fvc-diff'); diffEl.textContent=(diff>=0?'+ R$ ':'- R$ ')+fI(Math.abs(diff)); diffEl.className='mv '+(diff>=0?'green':'red');
+}
+function calcPVP(){
+  const preco=+(document.getElementById('pvp-preco')?.value||95);
+  const vp=+(document.getElementById('pvp-vp')?.value||100);
+  const dyMes=+(document.getElementById('pvp-dy')?.value||0.90)/100;
+  const pvp=preco/vp;
+  const desc=(1-pvp)*100;
+  const dyPreco=dyMes/preco*100;
+  const dyVP=dyMes/vp*100;
+  document.getElementById('pvp-rv').innerHTML=`P/VP ${pvp.toFixed(2)} — ${pvp<1?'Desconto':'Prêmio'} <span>${Math.abs(desc).toFixed(1)}%</span>`;
+  document.getElementById('pvp-det').textContent=pvp<1?`Você compra R$ ${f2(vp)} de patrimônio por R$ ${f2(preco)}`:`Você paga prêmio de ${Math.abs(desc).toFixed(1)}% sobre o VP`;
+  document.getElementById('pvp-ratio').textContent=pvp.toFixed(3);
+  const descEl=document.getElementById('pvp-desc'); descEl.textContent=(desc>0?'Desconto ':'Prêmio ')+Math.abs(desc).toFixed(1)+'%'; descEl.className='mv '+(desc>0?'green':'red');
+  document.getElementById('pvp-dy-preco').textContent=(dyPreco*12).toFixed(2)+'% a.a.';
+  document.getElementById('pvp-dy-vp').textContent=(dyVP*12).toFixed(2)+'% a.a.';
+}
+function calcCDB(){
+  const v=+(document.getElementById('cdb-val')?.value||10000);
+  const m=+(document.getElementById('cdb-prazo')?.value||12);
+  const pct=+(document.getElementById('cdb-pct')?.value||110);
+  const taxaA=API.cdi*pct/100/100;
+  const tm=Math.pow(1+taxaA,1/12)-1;
+  const final=v*Math.pow(1+tm,m);
+  const bruto=final-v;
+  const aliq=irAliq(m);
+  const ir=bruto*aliq;
+  const liq=bruto-ir;
+  const taxaliq=Math.pow(1+liq/v,12/m)-1;
+  document.getElementById('cdb-rv').innerHTML=`R$ ${fI(liq)} <span>líquido</span>`;
+  document.getElementById('cdb-det').textContent=`CDB ${pct}% CDI · ${m} meses · IR ${(aliq*100).toFixed(1)}%`;
+  document.getElementById('cdb-bruto').textContent='R$ '+fI(bruto);
+  document.getElementById('cdb-ir').textContent='- R$ '+fI(ir);
+  document.getElementById('cdb-liq').textContent='R$ '+fI(liq);
+  document.getElementById('cdb-saldo').textContent='R$ '+fI(final-ir);
+  document.getElementById('cdb-taxaliq').textContent=(taxaliq*100).toFixed(2)+'%';
+  document.getElementById('cdb-aliq').textContent=(aliq*100).toFixed(1)+'%';
+}
+function calcLCI(){
+  const v=+(document.getElementById('lci-val')?.value||10000);
+  const m=+(document.getElementById('lci-prazo')?.value||12);
+  const pct=+(document.getElementById('lci-pct')?.value||93);
+  const taxaA=API.cdi*pct/100/100;
+  const tm=Math.pow(1+taxaA,1/12)-1;
+  const final=v*Math.pow(1+tm,m);
+  const liq=final-v;
+  const taxaliq=Math.pow(1+liq/v,12/m)-1;
+  // Equivalent CDB % CDI for given aliq
+  const aliq=irAliq(m);
+  const taxaBruta=taxaliq/(1-aliq);
+  const equivPct=taxaBruta/API.cdi*100*100;
+  const cdbLiq=API.cdi*110/100/100; // compare with 110%
+  const cdb110Liq=Math.pow(1+Math.pow(1+cdbLiq,1/12)-1,m/12)-1; // approx
+  document.getElementById('lci-rv').innerHTML=`R$ ${fI(liq)} <span>líquido = bruto</span>`;
+  document.getElementById('lci-det').textContent=`LCI ${pct}% CDI · ${m} meses · Isento IR`;
+  document.getElementById('lci-rend').textContent='R$ '+fI(liq);
+  document.getElementById('lci-saldo').textContent='R$ '+fI(final);
+  document.getElementById('lci-taxaliq').textContent=(taxaliq*100).toFixed(2)+'%';
+  document.getElementById('lci-equiv').textContent=equivPct.toFixed(1)+'% CDI';
+  document.getElementById('lci-melhor').textContent=equivPct>110?'SIM':'NÃO';
+  document.getElementById('lci-melhor').className='mv '+(equivPct>110?'green':'red');
+  document.getElementById('lci-tip-text').textContent=`LCI ${pct}% CDI equivale a CDB ${equivPct.toFixed(1)}% CDI (alíquota ${(aliq*100).toFixed(1)}%). ${equivPct>110?'Esta LCI compensa mais que um CDB de 110% CDI.':'Verifique se há CDB com taxa superior a este equivalente.'}`;
+}
+function calcTS(){
+  const v=+(document.getElementById('ts-val')?.value||10000);
+  const m=+(document.getElementById('ts-prazo')?.value||12);
+  const selic=+(document.getElementById('ts-selic')?.value||10.5);
+  const taxaLiq=(selic-0.20)/100;
+  const tm=Math.pow(1+taxaLiq,1/12)-1;
+  const final=v*Math.pow(1+tm,m);
+  const bruto=final-v;
+  const aliq=irAliq(m);
+  const ir=bruto*aliq;
+  const liq=bruto-ir;
+  document.getElementById('ts-rv').innerHTML=`R$ ${fI(liq)} <span>líquido</span>`;
+  document.getElementById('ts-det').textContent=`Selic ${selic}% a.a. · Custódia 0,20% · IR ${(aliq*100).toFixed(1)}%`;
+  document.getElementById('ts-bruto').textContent='R$ '+fI(bruto);
+  document.getElementById('ts-ir').textContent='- R$ '+fI(ir);
+  document.getElementById('ts-liq').textContent='R$ '+fI(liq);
+  document.getElementById('ts-taxaliq').textContent=((Math.pow(1+liq/v,12/m)-1)*100).toFixed(2)+'%';
+  document.getElementById('ts-saldo').textContent='R$ '+fI(v+liq);
+}
+function calcTP(){
+  const v=+(document.getElementById('tp-val')?.value||10000);
+  const anos=+(document.getElementById('tp-prazo')?.value||3);
+  const taxa=+(document.getElementById('tp-taxa')?.value||13.5);
+  const selicEst=+(document.getElementById('tp-selic-est')?.value||10.0);
+  const bruto=v*Math.pow(1+taxa/100,anos)-v;
+  const aliq=anos<=2?0.175:0.15;
+  const ir=bruto*aliq;
+  const liq=bruto-ir;
+  // Selic estimated
+  const selicBruto=v*Math.pow(1+selicEst/100,anos)-v;
+  const selicIr=selicBruto*(anos<=2?0.175:0.15);
+  const selicLiq=selicBruto-selicIr;
+  const diff=liq-selicLiq;
+  const vantPct=((Math.pow(1+liq/v,1/anos)-1)-(Math.pow(1+selicLiq/v,1/anos)-1))*100;
+  document.getElementById('tp-rv').innerHTML=`R$ ${fI(liq)} <span>líquido no vencimento</span>`;
+  document.getElementById('tp-det').textContent=`${taxa}% a.a. · ${anos} anos · IR ${(aliq*100).toFixed(1)}%`;
+  document.getElementById('tp-bruto').textContent='R$ '+fI(bruto);
+  document.getElementById('tp-ir').textContent='- R$ '+fI(ir);
+  document.getElementById('tp-liq').textContent='R$ '+fI(liq);
+  document.getElementById('tp-saldo').textContent='R$ '+fI(v+liq);
+  document.getElementById('tp-vsselic').textContent=(diff>=0?'+ R$ ':'- R$ ')+fI(Math.abs(diff));
+  document.getElementById('tp-vsselic').className='mv '+(diff>=0?'green':'red');
+  document.getElementById('tp-vant').textContent=(vantPct>=0?'+':'')+vantPct.toFixed(1)+'% a.a.';
+  document.getElementById('tp-vant').className='mv '+(vantPct>=0?'green':'red');
+}
+function calcTI(){
+  const v=+(document.getElementById('ti-val')?.value||10000);
+  const anos=+(document.getElementById('ti-prazo')?.value||10);
+  const taxa=+(document.getElementById('ti-taxa')?.value||6.2);
+  const ipca=+(document.getElementById('ti-ipca')?.value||4.0);
+  const nominalA=(1+taxa/100)*(1+ipca/100)-1;
+  const finalNom=v*Math.pow(1+nominalA,anos);
+  const bruto=finalNom-v;
+  const aliq=anos>2?0.15:0.175;
+  const ir=bruto*aliq;
+  const liq=bruto-ir;
+  const inflacaoAcum=Math.pow(1+ipca/100,anos)-1;
+  const inflacaoR=v*inflacaoAcum;
+  const ganhoReal=finalNom-ir-v-inflacaoR;
+  const poderAdicional=(ganhoReal/v*100);
+  document.getElementById('ti-rv').innerHTML=`R$ ${fI(liq)} <span>líquido</span>`;
+  document.getElementById('ti-det').textContent=`IPCA+${taxa}% · ${anos} anos · IPCA ${ipca}% · IR ${(aliq*100).toFixed(1)}%`;
+  document.getElementById('ti-nom').textContent=(nominalA*100).toFixed(2)+'% a.a.';
+  document.getElementById('ti-bruto').textContent='R$ '+fI(bruto);
+  document.getElementById('ti-ir').textContent='- R$ '+fI(ir);
+  document.getElementById('ti-real').textContent='R$ '+fI(ganhoReal);
+  document.getElementById('ti-poder').textContent='+'+poderAdicional.toFixed(0)+'%';
+  document.getElementById('ti-saldo').textContent='R$ '+fI(finalNom);
+}
+function calcCompar(){
+  const v=+(document.getElementById('cp-val')?.value||10000);
+  const m=+(document.getElementById('cp-prazo')?.value||12);
+  const pct=+(document.getElementById('cp-pct')?.value||110);
+  const aliq=irAliq(m);
+  function simCDB(rate){ const tm=Math.pow(1+rate,1/12)-1; const f=v*Math.pow(1+tm,m); const br=f-v; return {br,ir:br*aliq,liq:br-br*aliq,taxaliq:Math.pow(1+br*(1-aliq)/v,12/m)-1}; }
+  function simLCI(rate){ const tm=Math.pow(1+rate,1/12)-1; const f=v*Math.pow(1+tm,m); const br=f-v; return {br,ir:0,liq:br,taxaliq:Math.pow(1+br/v,12/m)-1}; }
+  const cdi=API.cdi/100;
+  const rows=[
+    {name:'CDB '+pct+'% CDI', ...simCDB(cdi*pct/100), tipo:'CDB'},
+    {name:'LCI 93% CDI', ...simLCI(cdi*0.93), tipo:'LCI'},
+    {name:'LCI 90% CDI', ...simLCI(cdi*0.90), tipo:'LCI'},
+    {name:'Tesouro Selic', ...simCDB((API.selic-0.20)/100), tipo:'Tesouro'},
+    {name:'Poupança', ...simLCI(API.poupanca/100), tipo:'Poupança'},
+    {name:'CDB 100% CDI', ...simCDB(cdi), tipo:'CDB'},
+  ];
+  rows.sort((a,b)=>b.liq-a.liq);
+  const tbody=document.getElementById('comp-tbody');
+  tbody.innerHTML=rows.map((r,i)=>`<tr><td>${i===0?'🏆 ':''}${r.name}</td><td>R$ ${fI(r.br)}</td><td class="${r.ir>0?'macro-dn':''}">${r.ir>0?'- R$ '+fI(r.ir):'Isento'}</td><td class="${i===0?'best':''}">R$ ${fI(r.liq)}</td><td class="${i===0?'best':''}">${(r.taxaliq*100).toFixed(2)}% a.a.</td><td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</td></tr>`).join('');
+  document.getElementById('comp-tip-text').textContent=`Vencedor: ${rows[0].name} com R$ ${fI(rows[0].liq)} líquido em ${m} meses. Diferença para o pior: R$ ${fI(rows[0].liq-rows[rows.length-1].liq)}.`;
+}
+function calcJC(){
+  const cap=+(document.getElementById('jc-cap')?.value||5000);
+  const ap=+(document.getElementById('jc-ap')?.value||500);
+  const taxa=+(document.getElementById('jc-taxa')?.value||10);
+  const anos=+(document.getElementById('jc-anos')?.value||10);
+  const s=compoundMonthly(cap,ap,taxa,anos*12);
+  const inv=cap+ap*anos*12;
+  const rend=s-inv;
+  const renda=s*0.04/12;
+  document.getElementById('jc-rv').textContent='R$ '+fI(s);
+  document.getElementById('jc-det').textContent=`Os juros geraram R$ ${fI(rend)} — você investiu R$ ${fI(inv)}`;
+  document.getElementById('jc-inv').textContent='R$ '+fI(inv);
+  document.getElementById('jc-rend').textContent='R$ '+fI(rend);
+  document.getElementById('jc-ret').textContent=inv>0?((rend/inv)*100).toFixed(1)+'%':'—';
+  document.getElementById('jc-renda').textContent='R$ '+fI(renda)+'/mês';
+}
+function calcIF(){
+  const renda=+(document.getElementById('if-renda')?.value||10000);
+  const ap=+(document.getElementById('if-ap')?.value||2000);
+  const cap=+(document.getElementById('if-cap')?.value||50000);
+  const taxa=+(document.getElementById('if-taxa')?.value||10);
+  const retirada=+(document.getElementById('if-retirada')?.value||4);
+  const meta=renda*12/retirada*100;
+  const tm=Math.pow(1+taxa/100,1/12)-1;
+  let s=cap,m=0;
+  while(s<meta&&m<960){s=s*(1+tm)+ap;m++;}
+  const anos=m/12;
+  const inv=cap+ap*m;
+  document.getElementById('if-rv').textContent=m<960?anos.toFixed(1)+' anos':'Mais de 80 anos';
+  document.getElementById('if-det').textContent=`Patrimônio alvo: ${fK(meta)} para gerar R$ ${fI(renda)}/mês`;
+  document.getElementById('if-meta').textContent=fK(meta);
+  document.getElementById('if-anos').textContent=m<960?anos.toFixed(1):'80+';
+  document.getElementById('if-inv').textContent=fK(inv);
+  document.getElementById('if-mult').textContent=(meta/Math.max(inv,1)).toFixed(1)+'x';
+}
+function calcPA(){
+  const meta=+(document.getElementById('pa-meta')?.value||2000000);
+  const ap=+(document.getElementById('pa-ap')?.value||1500);
+  const cap=+(document.getElementById('pa-cap')?.value||20000);
+  const taxa=+(document.getElementById('pa-taxa')?.value||10);
+  const tm=Math.pow(1+taxa/100,1/12)-1;
+  let s=cap,m=0;
+  while(s<meta&&m<960){s=s*(1+tm)+ap;m++;}
+  const anos=m/12;
+  const inv=cap+ap*m;
+  document.getElementById('pa-rv').textContent=m<960?anos.toFixed(1)+' anos':'Mais de 80 anos';
+  document.getElementById('pa-det').textContent=`Investindo ${fK(ap)}/mês a ${taxa}% a.a.`;
+  document.getElementById('pa-anos').textContent=m<960?anos.toFixed(1):'80+';
+  document.getElementById('pa-meses').textContent=m;
+  document.getElementById('pa-inv').textContent=fK(inv);
+  document.getElementById('pa-renda').textContent='R$ '+fI(meta*0.04/12)+'/mês';
+}
+// ── AVANÇADO ──
+function calcBL(){
+  const v=+(document.getElementById('bl-val')?.value||50000);
+  const taxa=+(document.getElementById('bl-taxa')?.value||11);
+  const m=+(document.getElementById('bl-prazo')?.value||24);
+  const tipo=document.getElementById('bl-tipo')?.value||'cdb';
+  const tm=Math.pow(1+taxa/100,1/12)-1;
+  const final=v*Math.pow(1+tm,m);
+  const bruto=final-v;
+  const aliq=tipo==='cdb'?irAliq(m):0;
+  const ir=bruto*aliq;
+  const liq=bruto-ir;
+  const taxaliq=Math.pow(1+liq/v,12/m)-1;
+  document.getElementById('bl-rv').innerHTML=`R$ ${fI(liq)} <span>líquido</span>`;
+  document.getElementById('bl-bruto').textContent='R$ '+fI(bruto);
+  document.getElementById('bl-ir').textContent='- R$ '+fI(ir);
+  document.getElementById('bl-liq').textContent='R$ '+fI(liq);
+  document.getElementById('bl-taxab').textContent=taxa.toFixed(2)+'% a.a.';
+  document.getElementById('bl-taxal').textContent=(taxaliq*100).toFixed(2)+'% a.a.';
+}
+function calcIIOF(){
+  const rend=+(document.getElementById('ii-rend')?.value||5000);
+  const dias=+(document.getElementById('ii-dias')?.value||365);
+  const iof=iofAliq(dias)*100;
+  const rendPosIof=rend*(1-iofAliq(dias));
+  const aliq=dias<=30?0.225:dias<=180?0.225:dias<=360?0.20:dias<=720?0.175:0.15;
+  const ir=rendPosIof*aliq;
+  const liq=rend-rend*iofAliq(dias)-ir;
+  document.getElementById('ii-rv').innerHTML=`R$ ${f2(liq)} <span>líquido</span>`;
+  document.getElementById('ii-iof-pct').textContent=iof.toFixed(1)+'%';
+  document.getElementById('ii-iof-r').textContent='R$ '+f2(rend*iofAliq(dias));
+  document.getElementById('ii-ir-pct').textContent=(aliq*100).toFixed(1)+'%';
+  document.getElementById('ii-ir-r').textContent='R$ '+f2(ir);
+  document.getElementById('ii-liq').textContent='R$ '+f2(liq);
+}
+function calcEquiv(){
+  const val=+(document.getElementById('eq-lci')?.value||93);
+  const tipo=document.getElementById('eq-tipo')?.value||'pct';
+  const aliq=+(document.getElementById('eq-prazo')?.value||17.5)/100;
+  const taxaIsenta=tipo==='pct'?API.cdi*val/100:val;
+  const taxaEquiv=taxaIsenta/(1-aliq);
+  const pctCDI=taxaEquiv/API.cdi*100;
+  document.getElementById('eq-rv').innerHTML=`${pctCDI.toFixed(1)}% CDI <span>bruto equivalente</span>`;
+  document.getElementById('eq-det').textContent=`Taxa isenta ${taxaIsenta.toFixed(2)}% a.a. = CDB ${pctCDI.toFixed(1)}% CDI (IR ${(aliq*100).toFixed(1)}%)`;
+  document.getElementById('eq-isenta').textContent=taxaIsenta.toFixed(2)+'% a.a.';
+  document.getElementById('eq-cdb').textContent=pctCDI.toFixed(1)+'% CDI';
+  document.getElementById('eq-cdb-aa').textContent=taxaEquiv.toFixed(2)+'% a.a.';
+  document.getElementById('eq-aliq').textContent=(aliq*100).toFixed(1)+'%';
+}
+function calcTReal(){
+  const nom=+(document.getElementById('tr-nom')?.value||10.5);
+  const ipca=+(document.getElementById('tr-ipca')?.value||4.83);
+  const ir=+(document.getElementById('tr-ir')?.value||17.5);
+  const liq=nom*(1-ir/100);
+  const real=((1+liq/100)/(1+ipca/100)-1)*100;
+  document.getElementById('tr-rv').innerHTML=`${real>=0?'+':''}${real.toFixed(2)}% <span>ao ano acima da inflação</span>`;
+  document.getElementById('tr-det').textContent=`Ganho real líquido de IR e IPCA`;
+  document.getElementById('tr-nom-r').textContent=nom.toFixed(2)+'% a.a.';
+  document.getElementById('tr-liq').textContent=liq.toFixed(2)+'% a.a.';
+  document.getElementById('tr-inf').textContent=ipca.toFixed(2)+'% a.a.';
+  document.getElementById('tr-real').textContent=(real>=0?'+':'')+real.toFixed(2)+'% a.a.';
+  document.getElementById('tr-real').className='mv '+(real>0?'green':'red');
+}
+function calcVI(){
+  const v=+(document.getElementById('vi-val')?.value||100000);
+  const rend=+(document.getElementById('vi-rend')?.value||10.5);
+  const ipca=+(document.getElementById('vi-ipca')?.value||4.83);
+  const anos=+(document.getElementById('vi-anos')?.value||10);
+  const futAno=new Date().getFullYear()+anos;
+  const saldoNom=v*Math.pow(1+rend/100,anos);
+  const infAcum=Math.pow(1+ipca/100,anos)-1;
+  const infR=v*infAcum;
+  const ganhoReal=saldoNom-v-infR;
+  const poupSaldo=v*Math.pow(1+API.poupanca/100,anos);
+  document.getElementById('vi-ano-fut').textContent=futAno;
+  document.getElementById('vi-rv').innerHTML=`R$ ${fI(ganhoReal)} <span>ganho real</span>`;
+  document.getElementById('vi-nom').textContent='R$ '+fI(saldoNom);
+  document.getElementById('vi-inf-r').textContent='R$ '+fI(infR);
+  document.getElementById('vi-real-r').textContent='R$ '+fI(ganhoReal);
+  document.getElementById('vi-poup-r').textContent='R$ '+fI(poupSaldo);
+  const poupReal=poupSaldo-v-infR;
+  document.getElementById('vi-poup-real').textContent=(poupReal>=0?'+ R$ ':'- R$ ')+fI(Math.abs(poupReal));
+  document.getElementById('vi-poup-real').className='mv '+(poupReal>=0?'green':'red');
+  document.getElementById('vi-diff').textContent='+ R$ '+fI(ganhoReal-Math.max(poupReal,0));
+}
+function calcMM(){
+  const face=+(document.getElementById('mm-face')?.value||1000);
+  const taxaC=+(document.getElementById('mm-taxa-c')?.value||13.5);
+  const taxaM=+(document.getElementById('mm-taxa-m')?.value||12.0);
+  const anos=+(document.getElementById('mm-anos')?.value||5);
+  // Simplified: PV = FV / (1 + taxaM/100)^anos where FV = face * (1 + taxaC/100)^anos
+  const fv=face*Math.pow(1+taxaC/100,anos);
+  const pv=fv/Math.pow(1+taxaM/100,anos);
+  const ganho=pv-face;
+  document.getElementById('mm-rv').innerHTML=`R$ ${f2(pv)} <span>por R$ ${f2(face)} de face</span>`;
+  document.getElementById('mm-det').textContent=taxaC>taxaM?'Taxa de compra > taxa atual → título valorizado':'Taxa de compra < taxa atual → título desvalorizado';
+  document.getElementById('mm-mercado').textContent='R$ '+f2(pv);
+  document.getElementById('mm-mercado').className='mv '+(ganho>=0?'green':'red');
+  document.getElementById('mm-ganho').textContent=(ganho>=0?'+ R$ ':'- R$ ')+f2(Math.abs(ganho));
+  document.getElementById('mm-ganho').className='mv '+(ganho>=0?'green':'red');
+  document.getElementById('mm-ganho-pct').textContent=(ganho>=0?'+':'')+((ganho/face)*100).toFixed(1)+'%';
+  document.getElementById('mm-ganho-pct').className='mv '+(ganho>=0?'green':'red');
+}
+// ── CASHBACK ──
+function calcCashback(){
+  const gasto=+(document.getElementById('cb-gasto')?.value||5000);
+  const pSuper=+(document.getElementById('cb-super')?.value||40)/100;
+  const pViagem=+(document.getElementById('cb-viagem')?.value||20)/100;
+  const pOther=1-pSuper-pViagem;
+  const cartoes=[
+    {nome:'Nubank Roxinho', cb_std:0.01, cb_sup:0.01, cb_viag:0.01, melhor:'Uso geral'},
+    {nome:'Inter Black', cb_std:0.005, cb_sup:0.005, cb_viag:0.01, melhor:'Milhas + cashback'},
+    {nome:'PicPay Card', cb_std:0.015, cb_sup:0.015, cb_viag:0.015, melhor:'Cashback máximo'},
+    {nome:'XP Visa Infinite', cb_std:0.01, cb_sup:0.01, cb_viag:0.02, melhor:'Viagem e restaurante'},
+    {nome:'C6 Carbon', cb_std:0.008, cb_sup:0.008, cb_viag:0.012, melhor:'Milhas Black'},
+  ];
+  cartoes.forEach(c=>{c.ganho_mes=gasto*(pSuper*c.cb_sup+pViagem*c.cb_viag+pOther*c.cb_std);});
+  cartoes.sort((a,b)=>b.ganho_mes-a.ganho_mes);
+  document.getElementById('cb-tbody').innerHTML=cartoes.map((c,i)=>`<tr><td>${i===0?'🏆 ':''}${c.nome}</td><td>${(c.cb_std*100).toFixed(1)}%</td><td class="${i===0?'best':''}">R$ ${f2(c.ganho_mes)}</td><td class="${i===0?'best':''}">R$ ${fI(c.ganho_mes*12)}</td><td>${c.melhor}</td></tr>`).join('');
+}
+// ── NEWSLETTER ──
+function assinar(){
+  const e=document.getElementById('nl-email').value;
+  if(!e||!e.includes('@'))return;
+  document.getElementById('nl-ok').style.display='block';
+  document.getElementById('nl-email').value='';
+}
+// ── INIT ──
+applyToUI();
+calcCDB();calcLCI();calcTS();calcTP();calcTI();calcCompar();calcJC();calcIF();calcPA();
+calcBL();calcIIOF();calcEquiv();calcTReal();calcVI();calcMM();calcCashback();
+calcDY();calcPJ();calcDN();calcCarteira();calcRFvsRV();
+calcFIIRenda();calcFIICap();calcFIIvsImovel();calcFIIvsCDB();calcPVP();
+fetchAndCalc();
+</script>
+</body>
+</html>
