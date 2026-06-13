@@ -9492,7 +9492,9 @@ const TD_CSV_URL = 'https://www.tesourodireto.com.br/documents/d/guest/rendiment
 
 // Parseia o CSV de rendimento do tesourodireto.com.br
 function parsearCSVTesouro(texto) {
-  const linhas = texto.split('\n').map(l => l.trim()).filter(Boolean);
+  // Remove BOM e normaliza quebras de linha
+  const limpo = texto.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const linhas = limpo.split('\n').map(l => l.trim()).filter(Boolean);
   if (linhas.length < 2) return [];
 
   const titulos = [];
@@ -9544,39 +9546,46 @@ async function carregarTesouro(){
   const statusText = document.getElementById('td-status-text');
   if(badge) badge.innerHTML = '<span class="live-dot"></span> Conectando…';
 
-  // Proxies CORS — tenta Netlify Function primeiro (funciona em produção),
-  // depois proxies públicos como fallback para desenvolvimento local
-  const TD_PROXY_NETLIFY = '/.netlify/functions/tesouro-csv';
+  // Proxies CORS — tenta local primeiro (servidor proxy.js rodando na porta 3001)
+  // depois proxies públicos como fallback
+  const TD_PROXY_LOCAL = `http://localhost:3001/tesouro-csv`;
   const proxies = [
     {
-      url: () => TD_PROXY_NETLIFY,
+      url: () => TD_PROXY_LOCAL,
       parse: async r => r.text(),
-      nome: 'netlify-function'
-    },
-    {
-      url: () => `http://localhost:3001/tesouro-csv`,
-      parse: async r => r.text(),
-      nome: 'proxy-local'
+      nome: 'proxy local'
     },
     {
       url: u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}&nocache=${Date.now()}`,
       parse: async r => { const j = await r.json(); return j.contents; },
       nome: 'allorigins'
     },
+    {
+      url: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+      parse: async r => r.text(),
+      nome: 'codetabs'
+    },
+    {
+      url: u => `https://corsfix.com/${u}`,
+      parse: async r => r.text(),
+      nome: 'corsfix'
+    },
   ];
 
   for (const proxy of proxies) {
     try {
-      const proxyUrl = (proxy.nome === 'netlify-function' || proxy.nome === 'proxy-local')
-        ? proxy.url()
-        : proxy.url(TD_CSV_URL);
+      const proxyUrl = proxy.nome === 'proxy local' ? proxy.url() : proxy.url(TD_CSV_URL);
       const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const texto = await proxy.parse(r);
-      if (typeof texto !== 'string' || texto.length < 100) throw new Error('resposta vazia');
-      if (!texto.includes('Tesouro') && !texto.includes('Titulo')) throw new Error('não parece CSV do TD');
+      // Remove BOM e espaços iniciais
+      const textoLimpo = (typeof texto === 'string' ? texto : '').replace(/^\uFEFF/, '').trim();
+      if (textoLimpo.length < 50) throw new Error('resposta vazia');
+      // Valida que parece CSV do TD (aceita com ou sem acento, com BOM)
+      const parece = textoLimpo.includes('Tesouro') || textoLimpo.includes('Titulo') || textoLimpo.includes('Título');
+      if (!parece) throw new Error('não parece CSV do TD: ' + textoLimpo.slice(0, 80));
 
-      const parsed = parsearCSVTesouro(texto);
+      const parsed = parsearCSVTesouro(textoLimpo);
       if (!parsed.length) throw new Error('nenhum título parseado');
 
       tdTitulos = parsed;
