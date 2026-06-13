@@ -9546,35 +9546,24 @@ async function carregarTesouro(){
   const statusText = document.getElementById('td-status-text');
   if(badge) badge.innerHTML = '<span class="live-dot"></span> Conectando…';
 
-  // Proxies CORS — tenta local primeiro (servidor proxy.js rodando na porta 3001)
-  // depois proxies públicos como fallback
-  const TD_PROXY_LOCAL = `http://localhost:3001/tesouro-csv`;
+  // Tenta Netlify Function primeiro (sem CORS, funciona em produção)
+  const TD_PROXY_NETLIFY = '/.netlify/functions/tesouro-csv';
   const proxies = [
     {
-      url: () => TD_PROXY_LOCAL,
+      url: () => TD_PROXY_NETLIFY,
       parse: async r => r.text(),
-      nome: 'proxy local'
+      nome: 'netlify-function'
     },
     {
       url: u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}&nocache=${Date.now()}`,
       parse: async r => { const j = await r.json(); return j.contents; },
       nome: 'allorigins'
     },
-    {
-      url: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-      parse: async r => r.text(),
-      nome: 'codetabs'
-    },
-    {
-      url: u => `https://corsfix.com/${u}`,
-      parse: async r => r.text(),
-      nome: 'corsfix'
-    },
   ];
 
   for (const proxy of proxies) {
     try {
-      const proxyUrl = proxy.nome === 'proxy local' ? proxy.url() : proxy.url(TD_CSV_URL);
+      const proxyUrl = proxy.nome === 'netlify-function' ? proxy.url() : proxy.url(TD_CSV_URL);
       const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const texto = await proxy.parse(r);
