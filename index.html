@@ -9546,11 +9546,16 @@ async function carregarTesouro(){
   const statusText = document.getElementById('td-status-text');
   if(badge) badge.innerHTML = '<span class="live-dot"></span> Conectando…';
 
-  // Tenta Netlify Function primeiro (sem CORS, funciona em produção)
-  const TD_PROXY_NETLIFY = '/.netlify/functions/tesouro-csv';
+  // Tenta Service Worker primeiro (browser do usuário, sem bloqueio Cloudflare),
+  // depois Netlify Function, depois allorigins como último recurso
   const proxies = [
     {
-      url: () => TD_PROXY_NETLIFY,
+      url: () => '/tesouro-csv',
+      parse: async r => r.text(),
+      nome: 'service-worker'
+    },
+    {
+      url: () => '/.netlify/functions/tesouro-csv',
       parse: async r => r.text(),
       nome: 'netlify-function'
     },
@@ -9563,7 +9568,9 @@ async function carregarTesouro(){
 
   for (const proxy of proxies) {
     try {
-      const proxyUrl = proxy.nome === 'netlify-function' ? proxy.url() : proxy.url(TD_CSV_URL);
+      const proxyUrl = (proxy.nome === 'service-worker' || proxy.nome === 'netlify-function')
+        ? proxy.url()
+        : proxy.url(TD_CSV_URL);
       const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const texto = await proxy.parse(r);
@@ -11214,6 +11221,13 @@ function updateFerramenta(){
 
 // ── FOOTER YEAR ──
 document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+// ── SERVICE WORKER (busca CSV do Tesouro no browser, evita bloqueio Cloudflare) ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('[SW] registrado:', reg.scope))
+    .catch(err => console.log('[SW] falhou:', err.message));
+}
 
 // ── TEMA CLARO / ESCURO ──
 (function(){
