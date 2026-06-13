@@ -9591,6 +9591,8 @@ async function carregarTesouro(){
       if(window._tdAutoRefresh) clearTimeout(window._tdAutoRefresh);
       window._tdAutoRefresh = setTimeout(carregarTesouro, 60 * 60 * 1000);
       console.log('[TD] dados carregados via', proxy.nome);
+      // Atualiza os cards de taxa com os dados ao vivo
+      fetchTaxasTesouro();
       return;
     } catch(e) {
       console.log('[TD CSV]', proxy.nome, 'falhou:', e.message);
@@ -9865,39 +9867,42 @@ async function fetchTaxasTesouro(){
   const ts   = document.getElementById('td-taxas-ts');
   if(!grid) return;
 
-  const TD_API = 'https://www.tesourodireto.com.br/json/br/com/b3/tesourodireto/service/api/public/get.json';
-  let titulos = null;
-  let erros = [];
+  // Se carregarTesouro já carregou dados ao vivo, usa direto
+  if(tdTitulos.length > 0 && tdTitulos[0].rendimentoOriginal){
+    const COR={selic:'var(--success)',pre:'var(--gold-l)',ipca:'var(--accent-l)'};
+    const BG ={selic:'rgba(76,175,125,0.08)',pre:'rgba(232,169,64,0.08)',ipca:'rgba(75,158,240,0.08)'};
+    const LBL={selic:'Pós-fixado',pre:'Prefixado',ipca:'IPCA+'};
 
-  // 1. Tenta fetch direto (funciona quando o site está hospedado em domínio próprio)
-  try {
-    const r = await tryFetch(TD_API, 8000);
-    const arr = r?.response?.TrsrBondMkt?.TrsrBd;
-    if(arr?.length){ titulos = arr; console.log('[TD] Taxas ao vivo OK (direto)'); }
-  } catch(e){ erros.push('direto: ' + e.message); }
+    // Pega 1 Selic, 2 Prefixados e 3 IPCA+ para os cards
+    const selic  = tdTitulos.filter(t=>tipoTD(t.nome)==='selic').slice(0,1);
+    const pre    = tdTitulos.filter(t=>tipoTD(t.nome)==='prefixado').slice(0,2);
+    const ipca   = tdTitulos.filter(t=>tipoTD(t.nome)==='ipca').slice(0,3);
+    const cards  = [...selic,...pre,...ipca].slice(0,6).map(t=>({
+      nm: t.nome,
+      tipo: tipoTD(t.nome)==='prefixado'?'pre':tipoTD(t.nome),
+      taxa: t.taxaCompra,
+      mtrty: anoVenc(t.vencimento),
+      rendimento: t.rendimentoOriginal,
+    }));
 
-  // 2. Tenta via proxies CORS (funciona quando a origem não é tesourodireto.com.br)
-  if(!titulos){
-    for(const mkP of PROXIES){
-      try{
-        const url = mkP(TD_API);
-        const r = await tryFetch(url, 8000);
-        // allorigins embala em {contents:"..."}, outros retornam direto
-        const j = r?.contents ? JSON.parse(r.contents) : r;
-        const arr = j?.response?.TrsrBondMkt?.TrsrBd;
-        if(arr?.length){ titulos = arr; console.log('[TD] Taxas ao vivo OK (proxy)'); break; }
-        else erros.push(`proxy ${url.slice(0,40)}: sem dados`);
-      }catch(e){ erros.push(`proxy: ${e.message}`); }
+    grid.innerHTML = cards.map(c=>`
+      <div class="td-taxa-card" onclick="simularTitulo('${c.tipo}',${c.taxa})"
+           style="background:${BG[c.tipo]||BG.pre};border-color:${COR[c.tipo]||COR.pre}55">
+        <div style="font-size:10px;font-weight:700;color:${COR[c.tipo]||COR.pre};text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">${LBL[c.tipo]||'Prefixado'} · ${c.mtrty}</div>
+        <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--text);line-height:1.1">${c.rendimento||c.taxa.toFixed(2).replace('.',',')+'%'}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nm}</div>
+        <div style="font-size:10px;color:${COR[c.tipo]||COR.pre};margin-top:4px;font-weight:600">Simular →</div>
+      </div>`).join('');
+
+    if(ts){
+      const agora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      ts.innerHTML = `<span style="color:var(--success)">● ao vivo</span> · atualizado às ${agora} · <span style="font-size:10px;color:var(--text3);cursor:pointer;text-decoration:underline" onclick="carregarTesouro()">atualizar</span>`;
     }
+    return;
   }
 
-  if(!titulos) console.warn('[TD] Todos os fetches falharam. Motivo comum: tesourodireto.com.br bloqueia proxies CORS gratuitos. Use hospedagem própria para dados ao vivo.', erros);
-
-  // Fallback: usa os dados de tdTitulos se já carregados (evita duplicar lógica)
-  const fallbackDeTitulos = tdTitulos.length ? tdTitulos.slice(0,6).map(t => {
-    const tipo = t.nome.toLowerCase().includes('selic') ? 'selic' : t.nome.toLowerCase().includes('ipca') ? 'ipca' : 'pre';
-    return { nm: t.nome, tipo, taxa: t.taxaCompra, mtrty: anoVenc(t.vencimento) };
-  }) : [
+  // Fallback para dados de referência se carregarTesouro ainda não carregou
+  const fallbackDeTitulos = [
     {nm:'Tesouro Selic 2029',    tipo:'selic', taxa:TDM_TAXAS['selic-2029']||14.83, mtrty:'2029'},
     {nm:'Tesouro Prefixado 2029',tipo:'pre',   taxa:TDM_TAXAS['pre-2029']  ||13.87, mtrty:'2029'},
     {nm:'Tesouro Prefixado 2031',tipo:'pre',   taxa:TDM_TAXAS['pre-2031']  ||14.01, mtrty:'2031'},
@@ -9906,43 +9911,21 @@ async function fetchTaxasTesouro(){
     {nm:'Tesouro IPCA+ 2055',    tipo:'ipca',  taxa:TDM_TAXAS['ipca-2055'] ||7.84,  mtrty:'2055'},
   ];
 
-  const cards = titulos ? titulos.slice(0,6).map(t => {
-    const b = t.TrsrBd||t;
-    const nm = b.nm||''; const taxa = +(b.anulInvstmtRate||b.anulRedRate||0);
-    const mtrty = (b.mtrtyDt||'').slice(0,4);
-    const tipo = nm.toLowerCase().includes('selic')?'selic':nm.toLowerCase().includes('ipca')?'ipca':'pre';
-    // Atualiza TDM_TAXAS em tempo real com cada card carregado
-    if(tipo && mtrty && taxa) TDM_TAXAS[`${tipo}-${mtrty}`] = taxa;
-    return {nm,tipo,taxa,mtrty};
-  }) : fallbackDeTitulos;
-
   const COR={selic:'var(--success)',pre:'var(--gold-l)',ipca:'var(--accent-l)'};
   const BG ={selic:'rgba(76,175,125,0.08)',pre:'rgba(232,169,64,0.08)',ipca:'rgba(75,158,240,0.08)'};
   const LBL={selic:'Pós-fixado',pre:'Prefixado',ipca:'IPCA+'};
 
-  grid.innerHTML = cards.map(c=>`
+  grid.innerHTML = fallbackDeTitulos.map(c=>`
     <div class="td-taxa-card" onclick="simularTitulo('${c.tipo}',${c.taxa})"
          style="background:${BG[c.tipo]};border-color:${COR[c.tipo]}55">
       <div style="font-size:10px;font-weight:700;color:${COR[c.tipo]};text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">${LBL[c.tipo]} · ${c.mtrty}</div>
-      <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#fff;line-height:1.1">${c.taxa.toFixed(2).replace('.',',')}%<span style="font-size:11px;color:var(--text3);font-weight:400;margin-left:3px">a.a.</span></div>
-      <div style="font-size:10px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nm}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:var(--text);line-height:1.1">${c.taxa.toFixed(2).replace('.',',')}%<span style="font-size:11px;color:var(--text3);font-weight:400;margin-left:3px">a.a.</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px">${c.nm}</div>
       <div style="font-size:10px;color:${COR[c.tipo]};margin-top:4px;font-weight:600">Simular →</div>
     </div>`).join('');
 
   if(ts){
-    if(titulos){
-      const agora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-      ts.innerHTML = `<span style="color:var(--success)">● ao vivo</span> · atualizado às ${agora} · <span style="font-size:10px;color:var(--text3);cursor:pointer;text-decoration:underline" onclick="fetchTaxasTesouro()">atualizar</span>`;
-      // Agenda próxima atualização automática em 15 min
-      if(window._tdAutoRefresh) clearTimeout(window._tdAutoRefresh);
-      window._tdAutoRefresh = setTimeout(fetchTaxasTesouro, 15 * 60 * 1000);
-    } else {
-      const isFile = location.protocol === 'file:';
-      const dataRef = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
-      ts.innerHTML = isFile
-        ? `<span style="color:var(--gold)" title="Abra via localhost para dados ao vivo">⚠ file:// detectado</span> · <span style="font-size:10px;color:var(--accent-l);cursor:pointer;text-decoration:underline" onclick="mostrarDicaLocalhost()">como testar ao vivo?</span>`
-        : `<span style="color:var(--gold)">⚠ referência</span> · taxas de abr/2026 · <span style="font-size:10px;color:var(--accent-l);cursor:pointer;text-decoration:underline" onclick="fetchTaxasTesouro()">tentar ao vivo</span>`;
-    }
+    ts.innerHTML = `<span style="color:var(--gold)">⚠ referência</span> · taxas de abr/2026 · <span style="font-size:10px;color:var(--accent-l);cursor:pointer;text-decoration:underline" onclick="carregarTesouro().then(fetchTaxasTesouro)">tentar ao vivo</span>`;
   }
 }
 
