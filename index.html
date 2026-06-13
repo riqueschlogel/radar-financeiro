@@ -9544,21 +9544,37 @@ async function carregarTesouro(){
   const statusText = document.getElementById('td-status-text');
   if(badge) badge.innerHTML = '<span class="live-dot"></span> Conectando…';
 
-  // Tenta via allorigins (único proxy que funciona com CORS para este CSV)
+  // Proxies CORS — tenta Netlify Function primeiro (funciona em produção),
+  // depois proxies públicos como fallback para desenvolvimento local
+  const TD_PROXY_NETLIFY = '/.netlify/functions/tesouro-csv';
   const proxies = [
-    u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    {
+      url: () => TD_PROXY_NETLIFY,
+      parse: async r => r.text(),
+      nome: 'netlify-function'
+    },
+    {
+      url: () => `http://localhost:3001/tesouro-csv`,
+      parse: async r => r.text(),
+      nome: 'proxy-local'
+    },
+    {
+      url: u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}&nocache=${Date.now()}`,
+      parse: async r => { const j = await r.json(); return j.contents; },
+      nome: 'allorigins'
+    },
   ];
 
-  for (const mkProxy of proxies) {
+  for (const proxy of proxies) {
     try {
-      const proxyUrl = mkProxy(TD_CSV_URL);
-      const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+      const proxyUrl = (proxy.nome === 'netlify-function' || proxy.nome === 'proxy-local')
+        ? proxy.url()
+        : proxy.url(TD_CSV_URL);
+      const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
-      const json = await r.json();
-      // allorigins devolve { contents: "..." }, corsproxy devolve texto direto
-      const texto = json.contents ?? json;
-      if (typeof texto !== 'string' || texto.length < 200) throw new Error('resposta vazia');
+      const texto = await proxy.parse(r);
+      if (typeof texto !== 'string' || texto.length < 100) throw new Error('resposta vazia');
+      if (!texto.includes('Tesouro') && !texto.includes('Titulo')) throw new Error('não parece CSV do TD');
 
       const parsed = parsearCSVTesouro(texto);
       if (!parsed.length) throw new Error('nenhum título parseado');
@@ -9569,19 +9585,18 @@ async function carregarTesouro(){
       renderTDTimeline();
       atualizarDefaultsSimulador();
 
-      const dataBase = parsed[0]?.dataBase || '';
       const agora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
       if(badge) badge.innerHTML = `<span class="live-dot"></span> Tesouro Direto · ao vivo`;
       if(statusText) statusText.textContent = `${tdTitulos.length} títulos · dados oficiais tesourodireto.com.br · ${agora}`;
       const dh = document.getElementById('td-data-hora');
       if(dh) dh.textContent = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' · ' + agora;
 
-      // Auto-refresh no próximo dia útil às 19h (após fechamento do mercado às 18h)
       if(window._tdAutoRefresh) clearTimeout(window._tdAutoRefresh);
-      window._tdAutoRefresh = setTimeout(carregarTesouro, 60 * 60 * 1000); // retry em 1h
+      window._tdAutoRefresh = setTimeout(carregarTesouro, 60 * 60 * 1000);
+      console.log('[TD] dados carregados via', proxy.nome);
       return;
     } catch(e) {
-      console.log('[TD CSV] proxy falhou:', e.message);
+      console.log('[TD CSV]', proxy.nome, 'falhou:', e.message);
     }
   }
 
