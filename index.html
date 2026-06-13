@@ -9581,9 +9581,8 @@ async function carregarTesouro(){
       // Remove BOM e espaços iniciais
       const textoLimpo = (typeof texto === 'string' ? texto : '').replace(/^\uFEFF/, '').trim();
       if (textoLimpo.length < 50) throw new Error('resposta vazia');
-      // Valida que parece CSV do TD (aceita com ou sem acento, com BOM)
-      const parece = textoLimpo.includes('Tesouro') || textoLimpo.includes('Titulo') || textoLimpo.includes('Título');
-      if (!parece) throw new Error('não parece CSV do TD: ' + textoLimpo.slice(0, 80));
+      // Valida que parece CSV com ponto-e-vírgula (formato do TD)
+      if (!textoLimpo.includes(';')) throw new Error('não parece CSV: ' + textoLimpo.slice(0, 80));
 
       const parsed = parsearCSVTesouro(textoLimpo);
       if (!parsed.length) throw new Error('nenhum título parseado');
